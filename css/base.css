@@ -1,0 +1,207 @@
+/* =============================================================================
+   base.css — Design Tokens, Reset & Typography
+   Evergreen Digital · evergreendigitalco.com
+   =============================================================================
+
+   This file is the foundation of the design system.
+   Everything that other stylesheets build upon lives here.
+
+   Contents
+   --------
+   1. Design Tokens  (CSS custom properties)
+   2. Box Model Reset
+   3. Base Typography
+   4. Accessibility Utilities
+   ============================================================================= */
+
+
+/* =============================================================================
+   1. Design Tokens
+   These variables are the single source of truth for the entire design system.
+   Change a value here and it updates everywhere.
+   ============================================================================= */
+
+:root {
+
+  /* ── Color Palette ── */
+  --color-green:        #2a7a4b;   /* Primary brand green */
+  --color-green-light:  #35975d;   /* Hover state */
+  --color-green-dark:   #1d5c37;   /* Active / pressed state */
+  --color-green-pale:   #eaf5ef;   /* Tint backgrounds */
+  --color-green-mid:    #bde0cc;   /* Borders, dividers */
+  --color-green-glow:   #6ee89a;   /* Dark-bg accents */
+
+  --color-dark:         #0e1a13;   /* Primary dark (hero, footer) */
+  --color-charcoal:     #1a2e20;   /* Secondary dark */
+  --color-text:         #1e2d24;   /* Body text */
+  --color-muted:        #607568;   /* Secondary text, labels */
+  --color-border:       #dce8e0;   /* Dividers, input borders */
+
+  --color-white:        #ffffff;
+  --color-off-white:    #f6faf7;   /* Section backgrounds */
+  --color-cream:        #faf9f6;   /* Alternate section bg */
+
+  /* ── Typography ── */
+  --font-display: 'Playfair Display', Georgia, serif;   /* Headings */
+  --font-body:    'Outfit', system-ui, sans-serif;       /* Body text */
+
+  /* ── Spacing Scale (multiples of 4px) ── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* ── Border Radius ── */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+
+  /* ── Shadows ── */
+  --shadow-sm:    0 2px 12px rgba(0, 0, 0, 0.04);
+  --shadow-md:    0 8px 32px rgba(0, 0, 0, 0.08);
+  --shadow-lg:    0 24px 60px rgba(0, 0, 0, 0.14);
+  --shadow-green: 0 8px 32px rgba(42, 122, 75, 0.25);
+
+  /* ── Transitions ── */
+  --transition-fast:   0.15s ease;
+  --transition-base:   0.25s ease;
+  --transition-slow:   0.65s ease;
+
+  /* ── Z-index Scale ── */
+  --z-base:    0;
+  --z-raised:  10;
+  --z-nav:     100;
+  --z-modal:   1000;
+}
+
+
+/* =============================================================================
+   2. Box Model Reset
+   Applies a consistent baseline across all browsers.
+   ============================================================================= */
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%; /* Prevent font scaling in landscape on iOS */
+  text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--color-text);
+  background: var(--color-white);
+  overflow-x: hidden;
+}
+
+/* Remove default list styling when using semantic lists for layout */
+ul, ol {
+  list-style: none;
+}
+
+/* Block-level media */
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+/* Remove default link styling — components define their own */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Inherit font family in form elements (browsers don't do this by default) */
+input,
+button,
+select,
+textarea {
+  font-family: inherit;
+}
+
+/* Make buttons consistent */
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+
+/* =============================================================================
+   3. Base Typography
+   Sets the heading scale. Individual components override as needed.
+   ============================================================================= */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  color: var(--color-dark);
+}
+
+h1 {
+  font-size: clamp(46px, 5.5vw, 72px);
+  font-weight: 900;
+  letter-spacing: -2px;
+}
+
+h2 {
+  font-size: clamp(32px, 4vw, 50px);
+  font-weight: 900;
+  letter-spacing: -1.5px;
+  margin-bottom: var(--space-4);
+}
+
+h3 {
+  font-size: 21px;
+  font-weight: 900;
+}
+
+p {
+  line-height: 1.75;
+}
+
+
+/* =============================================================================
+   4. Accessibility Utilities
+   ============================================================================= */
+
+/* Visually hidden but accessible to screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Ensure focus is always visible for keyboard users */
+:focus-visible {
+  outline: 2px solid var(--color-green);
+  outline-offset: 3px;
+  border-radius: 3px;
+}

@@ -1,0 +1,1043 @@
+/* =============================================================================
+   components.css — Reusable UI Components
+   Evergreen Digital · evergreendigitalco.com
+   =============================================================================
+
+   Self-contained, reusable pieces of UI. Each component is documented
+   with its expected HTML structure.
+
+   Contents
+   --------
+   1.  Shared Section Helpers
+   2.  Buttons
+   3.  Navigation
+   4.  Marquee Strip
+   5.  Package Cards
+   6.  Before / After Cards
+   7.  Reviews CTA
+   8.  Booking Modal
+   9.  Contact Form
+   10. Footer
+   ============================================================================= */
+
+
+/* =============================================================================
+   1. Shared Section Helpers
+   Reused across multiple sections for consistent layout and labeling.
+   ============================================================================= */
+
+/* Max-width wrapper used inside sections */
+.section-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/*
+ * Eyebrow label above section headings.
+ * Renders as:  ——  LABEL TEXT
+ *
+ * Usage: <p class="section-label">Our Work</p>
+ */
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-green);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: var(--space-3);
+}
+
+.section-label::before {
+  content: '';
+  width: 28px;
+  height: 2px;
+  background: var(--color-green);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* Subheading paragraph below a section h2 */
+.section-sub {
+  font-size: 17px;
+  color: var(--color-muted);
+  font-weight: 300;
+  line-height: 1.75;
+  max-width: 520px;
+  margin-bottom: var(--space-16);
+}
+
+
+/* =============================================================================
+   2. Buttons
+   ============================================================================= */
+
+/*
+ * Primary CTA — solid green, used for main conversion actions.
+ * Usage: <button class="btn-primary">Book a Call →</button>
+ */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--color-green);
+  color: var(--color-white);
+  padding: 15px 32px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition:
+    background var(--transition-base),
+    transform var(--transition-base),
+    box-shadow var(--transition-base);
+  box-shadow: 0 4px 24px rgba(42, 122, 75, 0.4);
+}
+
+.btn-primary:hover {
+  background: var(--color-green-light);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(42, 122, 75, 0.45);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/*
+ * Ghost button — text only with underline border, used on dark backgrounds.
+ * Usage: <a href="#services" class="btn-ghost">See Packages ↓</a>
+ */
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 2px;
+  transition:
+    color var(--transition-base),
+    border-color var(--transition-base);
+}
+
+.btn-ghost:hover {
+  color: var(--color-white);
+  border-color: var(--color-white);
+}
+
+
+/* =============================================================================
+   3. Navigation
+   Fixed top bar with logo, links, and CTA.
+   ============================================================================= */
+
+/*
+ * <nav class="nav" id="main-nav">
+ *   <a class="nav__logo">...</a>
+ *   <div class="nav__links">...</div>
+ *   <button class="nav__cta">...</button>
+ * </nav>
+ */
+
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-nav);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 60px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--color-border);
+  transition: box-shadow var(--transition-base);
+}
+
+/* Added by JavaScript when user scrolls past 40px */
+.nav.is-scrolled {
+  box-shadow: var(--shadow-md);
+}
+
+.nav__logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  text-decoration: none;
+}
+
+.nav__logo img {
+  height: 36px;
+  width: auto;
+}
+
+.nav__links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.nav__links a {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-muted);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.nav__links a:hover {
+  color: var(--color-green);
+}
+
+/* Nav CTA button — same visual as .btn-primary but smaller */
+.nav__cta {
+  background: var(--color-green);
+  color: var(--color-white);
+  padding: 10px 22px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition:
+    background var(--transition-base),
+    transform var(--transition-base);
+}
+
+.nav__cta:hover {
+  background: var(--color-green-light);
+  transform: translateY(-1px);
+}
+
+
+/* =============================================================================
+   4. Marquee Strip
+   Infinite scrolling trust strip between hero and before/after sections.
+   Content is duplicated in HTML to create a seamless loop.
+   ============================================================================= */
+
+.marquee {
+  background: var(--color-green);
+  padding: 14px 0;
+  overflow: hidden;
+}
+
+.marquee__track {
+  display: flex;
+  white-space: nowrap;
+  /* Animation defined in animations.css */
+  animation: marquee-scroll 30s linear infinite;
+}
+
+/* Pause on hover for readability */
+.marquee__track:hover {
+  animation-play-state: paused;
+}
+
+.marquee__item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 32px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.02em;
+}
+
+/* Separator dot between items */
+.marquee__dot {
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+
+/* =============================================================================
+   5. Package Cards
+   The four pricing tier cards (Starter, Growth, Pro, Elite).
+   The featured card (.pkg-card--featured) uses dark background.
+   ============================================================================= */
+
+/*
+ * <div class="pkg-card [pkg-card--featured]">
+ *   <div class="pkg-card__badge">Most Popular</div>  <!-- optional -->
+ *   <div class="pkg-card__emoji">🌿</div>
+ *   <h3 class="pkg-card__name">Growth</h3>
+ *   <p class="pkg-card__tagline">...</p>
+ *   <div class="pkg-card__price">...</div>
+ *   <p class="pkg-card__best">...</p>
+ *   <ul class="pkg-card__features">...</ul>
+ *   <button class="pkg-card__cta">Get Started →</button>
+ * </div>
+ */
+
+.pkg-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-white);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 28px 22px;
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform var(--transition-base),
+    box-shadow var(--transition-base),
+    border-color var(--transition-base);
+}
+
+.pkg-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 50px rgba(42, 122, 75, 0.12);
+  border-color: var(--color-green-mid);
+}
+
+/* Featured / highlighted card */
+.pkg-card--featured {
+  background: var(--color-dark);
+  border-color: var(--color-dark);
+  box-shadow: 0 8px 40px rgba(14, 26, 19, 0.3);
+}
+
+.pkg-card--featured:hover {
+  box-shadow: 0 24px 60px rgba(14, 26, 19, 0.4);
+}
+
+/* "Most Popular" pill badge */
+.pkg-card__badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-green);
+  color: var(--color-white);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.pkg-card__emoji  { font-size: 24px; margin-bottom: var(--space-2); margin-top: var(--space-2); }
+
+.pkg-card__name {
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 900;
+  color: var(--color-dark);
+  margin-bottom: 4px;
+}
+
+.pkg-card--featured .pkg-card__name { color: var(--color-white); }
+
+.pkg-card__tagline {
+  font-size: 11px;
+  color: var(--color-muted);
+  font-weight: 500;
+  margin-bottom: var(--space-3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pkg-card--featured .pkg-card__tagline { color: rgba(255, 255, 255, 0.45); }
+
+/* Price display: "from $150 /mo" */
+.pkg-card__price {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: var(--space-3);
+}
+
+.pkg-card__price-from   { font-size: 11px; color: var(--color-muted); font-weight: 400; }
+.pkg-card__price-amount { font-family: var(--font-display); font-size: 32px; font-weight: 900; color: var(--color-green); }
+.pkg-card__price-per    { font-size: 12px; color: var(--color-muted); }
+
+.pkg-card--featured .pkg-card__price-amount { color: var(--color-green-glow); }
+
+/* "Best for:" callout box */
+.pkg-card__best {
+  font-size: 11.5px;
+  color: var(--color-muted);
+  line-height: 1.65;
+  padding: 10px 12px;
+  background: var(--color-off-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-4);
+}
+
+.pkg-card--featured .pkg-card__best {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Feature list */
+.pkg-card__features {
+  list-style: none;
+  flex: 1;                /* Push CTA to bottom */
+  margin-bottom: var(--space-5);
+}
+
+.pkg-card__features li {
+  display: flex;
+  gap: var(--space-2);
+  font-size: 12px;
+  color: var(--color-muted);
+  padding: 5px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.pkg-card__features li:last-child { border-bottom: none; }
+
+/* Green checkmark before each feature */
+.pkg-card__features li::before {
+  content: '✓';
+  color: var(--color-green);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.pkg-card--featured .pkg-card__features li {
+  color: rgba(255, 255, 255, 0.55);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.pkg-card--featured .pkg-card__features li::before {
+  color: var(--color-green-glow);
+}
+
+/* Card CTA button */
+.pkg-card__cta {
+  display: block;
+  text-align: center;
+  background: var(--color-green-pale);
+  color: var(--color-green);
+  border: 1.5px solid var(--color-green-mid);
+  padding: 11px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition:
+    background var(--transition-base),
+    color var(--transition-base),
+    border-color var(--transition-base);
+  margin-top: auto;
+}
+
+.pkg-card__cta:hover {
+  background: var(--color-green);
+  color: var(--color-white);
+  border-color: var(--color-green);
+}
+
+.pkg-card--featured .pkg-card__cta {
+  background: var(--color-green);
+  color: var(--color-white);
+  border-color: var(--color-green);
+}
+
+.pkg-card--featured .pkg-card__cta:hover {
+  background: var(--color-green-light);
+}
+
+
+/* =============================================================================
+   6. Before / After Cards
+   Two-column grid comparing old vs new client site screenshots.
+   ============================================================================= */
+
+.ba-card {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-white);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Column header label */
+.ba-card__label {
+  padding: 12px 18px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.ba-card__label--before {
+  background: #fff5f5;
+  color: #8a1a1a;
+  border-bottom: 1px solid #fcd4d4;
+}
+
+.ba-card__label--after {
+  background: var(--color-green-pale);
+  color: var(--color-green);
+  border-bottom: 1px solid var(--color-green-mid);
+}
+
+/* Screenshot image stack */
+.ba-card__screenshots {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+}
+
+.ba-card__screenshot {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  display: block;
+  transition:
+    transform var(--transition-base),
+    box-shadow var(--transition-base);
+}
+
+.ba-card__screenshot:hover {
+  transform: scale(1.01);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.13);
+}
+
+/* Result summary bar at bottom of card */
+.ba-card__result {
+  padding: 14px 18px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.ba-card__result--good {
+  background: var(--color-green-pale);
+  border-top: 1px solid var(--color-green-mid);
+  color: var(--color-green);
+}
+
+.ba-card__result--bad {
+  background: #fff5f5;
+  border-top: 1px solid #fcd4d4;
+  color: #8a1a1a;
+}
+
+
+/* =============================================================================
+   7. Reviews CTA
+   Dark section with Google review call-to-action.
+   Replaced with real reviews once collected.
+   ============================================================================= */
+
+.reviews-cta {
+  padding: 80px 60px;
+  background: var(--color-dark);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background glow effect */
+.reviews-cta::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 300px;
+  background: radial-gradient(ellipse, rgba(42, 122, 75, 0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.reviews-cta .section-label {
+  color: var(--color-green-glow);
+  justify-content: center;
+}
+
+.reviews-cta .section-label::before {
+  background: var(--color-green-glow);
+}
+
+.reviews-cta h2 {
+  color: var(--color-white);
+  max-width: 600px;
+  margin: 0 auto var(--space-4);
+}
+
+.reviews-cta__desc {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.55);
+  max-width: 480px;
+  margin: 0 auto var(--space-8);
+  line-height: 1.75;
+}
+
+.reviews-cta__stars {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  margin-bottom: var(--space-6);
+}
+
+.reviews-cta__stars span { font-size: 28px; color: #f59e0b; }
+
+.reviews-cta__star-label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-left: 4px;
+}
+
+/* Google review link button */
+.reviews-cta__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--color-white);
+  color: var(--color-dark);
+  padding: 14px 28px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    transform var(--transition-base),
+    box-shadow var(--transition-base);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.reviews-cta__btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Circular Google "G" icon */
+.reviews-cta__google-g {
+  width: 20px;
+  height: 20px;
+  background: #4285f4;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 900;
+  font-style: italic;
+  color: var(--color-white);
+  flex-shrink: 0;
+}
+
+
+/* =============================================================================
+   8. Booking Modal — 2-step lead funnel
+   Step 1: Lead capture form
+   Step 2: Inline Calendly embed (loaded on demand)
+   Controlled by js/modal.js
+   ============================================================================= */
+
+/* Full-screen overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  background: rgba(14, 26, 19, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  /* Initial state — invisible */
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+/* Visible state — toggled by JavaScript */
+.modal-overlay.is-open {
+  opacity: 1;
+}
+
+/* Hidden via HTML attribute — display:none until JS removes it */
+.modal-overlay[hidden] {
+  display: none;
+}
+
+/* Modal card */
+.modal {
+  position: relative;
+  background: var(--color-white);
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 680px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.3);
+  /* Slide up on open */
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+}
+
+.modal-overlay.is-open .modal {
+  transform: translateY(0);
+}
+
+/* Wide variant for Calendly embed */
+.modal--wide {
+  max-width: 760px;
+}
+
+/* ✕ Close button */
+.modal__close {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-5);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-off-white);
+  color: var(--color-muted);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+  z-index: 2;
+}
+
+.modal__close:hover {
+  background: var(--color-border);
+  color: var(--color-dark);
+}
+
+/* Each step is a full-card view */
+.modal__step {
+  padding: 44px 48px 40px;
+}
+
+.modal__step[hidden] { display: none; }
+
+/* Calendly step gets slightly less horizontal padding */
+.modal__step--calendly {
+  padding: 44px 40px 32px;
+}
+
+/* Header block above form or Calendly */
+.modal__header { margin-bottom: var(--space-6); }
+
+.modal__label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-green);
+  margin-bottom: var(--space-2);
+}
+
+.modal__heading {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -0.75px;
+  color: var(--color-dark);
+  margin-bottom: var(--space-3);
+  line-height: 1.15;
+}
+
+/* Urgency text with pulsing amber dot */
+.modal__urgency {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.urgency-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f59e0b;
+  flex-shrink: 0;
+  /* Animation defined in animations.css */
+  animation: urgency-pulse 2s ease-in-out infinite;
+}
+
+/* Form layout */
+.modal__form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.modal__form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: var(--space-3);
+}
+
+.modal__label-field {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.modal__label-field .optional {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--color-muted);
+}
+
+.modal__input,
+.modal__select {
+  padding: 12px 16px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-text);
+  background: var(--color-white);
+  outline: none;
+  width: 100%;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.modal__input:focus,
+.modal__select:focus {
+  border-color: var(--color-green);
+  box-shadow: 0 0 0 3px rgba(42, 122, 75, 0.12);
+}
+
+/* Validation error state */
+.modal__input.is-invalid,
+.modal__select.is-invalid {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+/* Inline error message */
+.modal__error {
+  font-size: 11.5px;
+  color: #dc2626;
+  font-weight: 500;
+  min-height: 16px;
+  display: block;
+}
+
+/* Submit button */
+.modal__submit {
+  width: 100%;
+  padding: 15px;
+  background: var(--color-green);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background var(--transition-base),
+    transform var(--transition-base),
+    box-shadow var(--transition-base);
+  box-shadow: 0 4px 20px rgba(42, 122, 75, 0.35);
+  margin-top: 4px;
+}
+
+.modal__submit:hover {
+  background: var(--color-green-light);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 28px rgba(42, 122, 75, 0.4);
+}
+
+.modal__submit:active { transform: translateY(0); }
+
+/* Fine print below submit */
+.modal__disclaimer {
+  font-size: 11px;
+  color: var(--color-muted);
+  text-align: center;
+  margin-top: var(--space-3);
+  line-height: 1.5;
+}
+
+/* Calendly widget border radius fix */
+.calendly-inline-widget {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+
+/* =============================================================================
+   9. Contact Form
+   The standalone contact form in the Contact section (not the modal).
+   ============================================================================= */
+
+.contact__form {
+  background: var(--color-off-white);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 36px;
+}
+
+.form__title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.form__subtitle {
+  font-size: 13px;
+  color: var(--color-muted);
+  margin-bottom: var(--space-6);
+  line-height: 1.6;
+}
+
+.form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.form__group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: var(--space-3);
+}
+
+.form__label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form__input,
+.form__select,
+.form__textarea {
+  padding: 12px 16px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-text);
+  background: var(--color-white);
+  outline: none;
+  width: 100%;
+  transition: border-color var(--transition-fast);
+}
+
+.form__input:focus,
+.form__select:focus,
+.form__textarea:focus {
+  border-color: var(--color-green);
+}
+
+.form__textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.form__submit {
+  width: 100%;
+  padding: 14px;
+  background: var(--color-green);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background var(--transition-base),
+    transform var(--transition-base);
+  box-shadow: 0 4px 16px rgba(42, 122, 75, 0.3);
+}
+
+.form__submit:hover {
+  background: var(--color-green-light);
+  transform: translateY(-1px);
+}
+
+
+/* =============================================================================
+   10. Footer
+   ============================================================================= */
+
+.footer {
+  background: var(--color-dark);
+  color: rgba(255, 255, 255, 0.5);
+  padding: 36px 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.footer__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.footer__brand img { height: 28px; width: auto; }
+
+.footer__copy { font-size: 12px; }
+
+.footer__links {
+  display: flex;
+  gap: var(--space-5);
+}
+
+.footer__links a {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.footer__links a:hover { color: var(--color-white); }

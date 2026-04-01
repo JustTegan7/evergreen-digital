@@ -1,0 +1,139 @@
+/* =============================================================================
+   animations.css — Motion & Animation
+   Evergreen Digital · evergreendigitalco.com
+   =============================================================================
+
+   All animation-related CSS lives here. Keeping motion separate from layout
+   makes it easy to audit, adjust, or disable animations globally.
+
+   Contents
+   --------
+   1. Scroll Reveal Utilities
+   2. Marquee / Ticker Animation
+   3. Urgency Dot Pulse
+   4. Hero Entry Animations
+   5. Reduced Motion Override  (accessibility)
+   ============================================================================= */
+
+
+/* =============================================================================
+   1. Scroll Reveal Utilities
+   JavaScript in animations.js adds `.is-visible` when elements enter
+   the viewport via IntersectionObserver. The transitions are defined here.
+   ============================================================================= */
+
+/* Fade up — default reveal direction */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity var(--transition-slow),
+    transform var(--transition-slow);
+}
+
+/* Slide in from left */
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-28px);
+  transition:
+    opacity var(--transition-slow),
+    transform var(--transition-slow);
+}
+
+/* Slide in from right */
+.reveal-right {
+  opacity: 0;
+  transform: translateX(28px);
+  transition:
+    opacity var(--transition-slow),
+    transform var(--transition-slow);
+}
+
+/* Visible state — applied by IntersectionObserver */
+.reveal.is-visible,
+.reveal-left.is-visible,
+.reveal-right.is-visible {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
+/* Staggered delay helpers — apply alongside .reveal */
+.reveal-delay-1 { transition-delay: 0.10s; }
+.reveal-delay-2 { transition-delay: 0.20s; }
+.reveal-delay-3 { transition-delay: 0.30s; }
+.reveal-delay-4 { transition-delay: 0.40s; }
+
+
+/* =============================================================================
+   2. Marquee / Ticker Animation
+   CSS-only infinite scroll. JavaScript pauses it on hover via
+   animation-play-state (see components.css for the .marquee structure).
+   ============================================================================= */
+
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); } /* -50% because content is duplicated */
+}
+
+
+/* =============================================================================
+   3. Urgency Dot Pulse
+   The amber pulsing dot in the booking modal that reads
+   "Limited onboarding spots available this month"
+   ============================================================================= */
+
+@keyframes urgency-pulse {
+  0%,
+  100% { opacity: 1;   transform: scale(1);    }
+  50%  { opacity: 0.6; transform: scale(0.85); }
+}
+
+
+/* =============================================================================
+   4. Hero Entry Animations
+   Children of .hero__content animate in on page load via staggered
+   animation-delay — no JavaScript required.
+   ============================================================================= */
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Modal open animation */
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.6); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+
+/* =============================================================================
+   5. Reduced Motion Override
+   Respects the user's system preference to reduce motion.
+   Disables transforms and transitions for users who need them off.
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Keep elements visible even without animation */
+  .reveal,
+  .reveal-left,
+  .reveal-right {
+    opacity: 1;
+    transform: none;
+  }
+}

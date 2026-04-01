@@ -1,0 +1,28 @@
+/* =============================================================================
+   styles.css — Master Stylesheet
+   Evergreen Digital · evergreendigitalco.com
+   =============================================================================
+
+   This file is the single entry point for all styles.
+   It imports the four partial stylesheets in dependency order:
+
+     1. base.css        — Design tokens, CSS reset, base typography
+     2. animations.css  — Keyframes and scroll reveal utilities
+     3. components.css  — Reusable UI components (nav, cards, modal, form)
+     4. layout.css      — Section-level layout, grids, and responsive rules
+
+   To modify styles:
+     - Design tokens (colors, spacing, fonts) → base.css
+     - Animation timing or keyframes         → animations.css
+     - A specific component (e.g. modal)     → components.css
+     - Section layout or grid breakpoints    → layout.css
+
+   Note: Native CSS @import is used here for simplicity and zero-build-step
+   deployment. In a build pipeline (Vite, webpack, etc.) these would be
+   converted to bundled imports automatically.
+   ============================================================================= */
+
+@import url('base.css');
+@import url('animations.css');
+@import url('components.css');
+@import url('layout.css');

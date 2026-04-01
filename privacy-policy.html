@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, follow">
+  <title>Privacy Policy — Evergreen Digital</title>
+
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --green:       #2a7a4b;
+      --green-light: #35975d;
+      --green-pale:  #eaf5ef;
+      --green-mid:   #bde0cc;
+      --dark:        #0e1a13;
+      --text:        #1e2d24;
+      --muted:       #607568;
+      --border:      #dce8e0;
+      --off-white:   #f6faf7;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body:    'Outfit', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: white;
+      color: var(--text);
+    }
+
+    /* Nav */
+    .nav {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 18px 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav__logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .nav__logo img { height: 32px; width: auto; }
+
+    .nav__back {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav__back:hover { color: var(--green); }
+
+    /* Header */
+    .page-header {
+      background: var(--off-white);
+      border-bottom: 1px solid var(--border);
+      padding: 60px 60px 50px;
+    }
+
+    .page-header__inner { max-width: 760px; margin: 0 auto; }
+
+    .page-header__label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .page-header__label::before {
+      content: '';
+      width: 24px; height: 2px;
+      background: var(--green);
+      border-radius: 2px;
+    }
+
+    .page-header h1 {
+      font-family: var(--font-display);
+      font-size: 40px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      color: var(--dark);
+      margin-bottom: 12px;
+    }
+
+    .page-header__meta {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* Content */
+    .policy {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 60px 60px 100px;
+    }
+
+    .policy h2 {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--dark);
+      margin: 40px 0 14px;
+      padding-bottom: 10px;
+      border-bottom: 1.5px solid var(--border);
+    }
+
+    .policy h2:first-child { margin-top: 0; }
+
+    .policy p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 16px;
+    }
+
+    .policy ul {
+      list-style: none;
+      margin-bottom: 16px;
+    }
+
+    .policy ul li {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.8;
+      padding: 4px 0 4px 20px;
+      position: relative;
+    }
+
+    .policy ul li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .policy a {
+      color: var(--green);
+      text-decoration: none;
+      border-bottom: 1px solid var(--green-mid);
+      transition: border-color 0.2s;
+    }
+
+    .policy a:hover { border-color: var(--green); }
+
+    .policy strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .contact-box {
+      background: var(--off-white);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-top: 40px;
+    }
+
+    .contact-box h2 {
+      border: none;
+      margin: 0 0 14px;
+      padding: 0;
+      font-size: 18px;
+    }
+
+    .contact-box p { margin-bottom: 6px; }
+    .contact-box p:last-child { margin-bottom: 0; }
+
+    /* Footer */
+    .footer {
+      background: var(--dark);
+      color: rgba(255, 255, 255, 0.5);
+      padding: 32px 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer p { font-size: 12px; }
+
+    .footer a {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer a:hover { color: white; }
+
+    @media (max-width: 700px) {
+      .nav,
+      .page-header,
+      .policy,
+      .footer { padding-left: 24px; padding-right: 24px; }
+      .page-header h1 { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="/" class="nav__logo">
+      <img src="assets/brand/logo.svg" alt="Evergreen Digital" width="150" height="34">
+    </a>
+    <a href="/" class="nav__back">← Back to Home</a>
+  </nav>
+
+  <div class="page-header">
+    <div class="page-header__inner">
+      <div class="page-header__label">Legal</div>
+      <h1>Privacy Policy</h1>
+      <p class="page-header__meta">
+        Last updated: January 1, 2026 &nbsp;·&nbsp; Evergreen Digital LLC
+      </p>
+    </div>
+  </div>
+
+  <div class="policy">
+
+    <h2>Overview</h2>
+    <p>
+      Evergreen Digital LLC ("Evergreen Digital," "we," "us," or "our") operates the website
+      at <strong>evergreendigitalco.com</strong>. This Privacy Policy explains how we collect,
+      use, and protect your personal information when you visit our site or inquire about our services.
+    </p>
+    <p>
+      By using this website, you agree to the collection and use of information as described in
+      this policy. We take your privacy seriously and will never sell your personal information
+      to third parties.
+    </p>
+
+    <h2>Information We Collect</h2>
+    <p>We collect information you voluntarily provide when you fill out our contact form, including:</p>
+    <ul>
+      <li>Your name</li>
+      <li>Your business name</li>
+      <li>Your email address</li>
+      <li>Your message or inquiry</li>
+      <li>The service you're interested in</li>
+    </ul>
+    <p>We also automatically collect certain technical information when you visit our site:</p>
+    <ul>
+      <li>IP address and general geographic location</li>
+      <li>Browser type and version</li>
+      <li>Pages visited and time spent on site</li>
+      <li>Referring website or search term</li>
+      <li>Device type (desktop, mobile, tablet)</li>
+    </ul>
+
+    <h2>How We Use Your Information</h2>
+    <p>We use the information we collect to:</p>
+    <ul>
+      <li>Respond to your inquiry and schedule discovery calls</li>
+      <li>Provide you with a quote or proposal</li>
+      <li>Send you service-related communications</li>
+      <li>Improve our website and services based on analytics</li>
+      <li>Comply with legal obligations</li>
+    </ul>
+    <p>
+      We do not use your information for unsolicited marketing. If you become a client, we may
+      send occasional updates about your services or relevant changes — you can opt out at any time.
+    </p>
+
+    <h2>Contact Form &amp; Form Processing</h2>
+    <p>
+      Our contact form is processed by <strong>Formspree</strong> (formspree.io), a third-party
+      form handling service. When you submit a form, your data is transmitted to Formspree's servers
+      and then forwarded to our email address. Formspree's privacy policy is available at
+      <a href="https://formspree.io/legal/privacy-policy" target="_blank" rel="noopener noreferrer">formspree.io/legal/privacy-policy</a>.
+    </p>
+
+    <h2>Analytics &amp; Cookies</h2>
+    <p>
+      We use <strong>Google Analytics</strong> to understand how visitors use our site. Google
+      Analytics collects anonymized data about your visit, including pages viewed, time on site,
+      and general location. This data is aggregated and does not personally identify you.
+    </p>
+    <p>
+      You can opt out of Google Analytics tracking by installing the
+      <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer">
+        Google Analytics Opt-out Browser Add-on
+      </a>.
+    </p>
+
+    <h2>Third-Party Services</h2>
+    <p>Our website may link to or reference the following third-party services:</p>
+    <ul>
+      <li><strong>Google Analytics</strong> — website analytics</li>
+      <li><strong>Formspree</strong> — contact form processing</li>
+      <li><strong>Calendly</strong> — discovery call scheduling</li>
+      <li><strong>Google Business Profile</strong> — business listing and reviews</li>
+    </ul>
+    <p>We are not responsible for the privacy practices of these third-party services.</p>
+
+    <h2>Data Security</h2>
+    <p>
+      Our website uses SSL/HTTPS encryption for all data transmission. We do not store form
+      submissions in a database — they are forwarded directly to our email.
+    </p>
+
+    <h2>Your Rights</h2>
+    <p>Depending on your location, you may have the right to:</p>
+    <ul>
+      <li>Request a copy of the personal information we hold about you</li>
+      <li>Request correction of inaccurate information</li>
+      <li>Request deletion of your personal information</li>
+      <li>Opt out of any marketing communications</li>
+    </ul>
+    <p>To exercise any of these rights, please contact us below. We will respond within 30 days.</p>
+
+    <h2>Children's Privacy</h2>
+    <p>
+      Our website and services are not directed at children under the age of 13.
+      We do not knowingly collect personal information from children.
+    </p>
+
+    <h2>Changes to This Policy</h2>
+    <p>
+      We may update this Privacy Policy from time to time. When we do, we'll update the
+      "Last updated" date at the top of this page.
+    </p>
+
+    <div class="contact-box">
+      <h2>Contact Us</h2>
+      <p>If you have questions about this Privacy Policy or how we handle your data:</p>
+      <p><strong>Evergreen Digital LLC</strong></p>
+      <p>Email: <a href="mailto:hello@evergreendigitalco.com">hello@evergreendigitalco.com</a></p>
+      <p>Website: <a href="https://www.evergreendigitalco.com">www.evergreendigitalco.com</a></p>
+      <p>State of incorporation: Washington, USA</p>
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    <p>© 2026 Evergreen Digital LLC</p>
+    <a href="/">← Back to Home</a>
+  </footer>
+
+</body>
+</html>

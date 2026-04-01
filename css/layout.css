@@ -1,0 +1,596 @@
+/* =============================================================================
+   layout.css — Page Layout & Section Structure
+   Evergreen Digital · evergreendigitalco.com
+   =============================================================================
+
+   Handles macro-level layout: section padding, grid systems, and
+   the structural arrangement of content within each page section.
+   Component-level styling lives in components.css.
+
+   Contents
+   --------
+   1.  Hero Section
+   2.  Hero Mockup (browser illustration)
+   3.  Before / After Section
+   4.  Packages Section
+   5.  About Section
+   6.  Contact Section
+   7.  Responsive — Tablet  (≤ 1024px)
+   8.  Responsive — Mobile  (≤  900px)
+   9.  Responsive — Small   (≤  600px)
+   ============================================================================= */
+
+
+/* =============================================================================
+   1. Hero Section
+   Full-viewport dark section with two-column grid (copy + browser mockup).
+   ============================================================================= */
+
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  background: var(--color-dark);
+  position: relative;
+  overflow: hidden;
+  padding-top: 80px; /* Offset for fixed nav */
+}
+
+/* Atmospheric radial gradient orbs — purely decorative */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  right: -10%;
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(ellipse, rgba(42, 122, 75, 0.35) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -10%;
+  left: -5%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(ellipse, rgba(42, 122, 75, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Two-column grid: copy left, mockup right */
+.hero__grid {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 60px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+/* ── Left column: copy ── */
+
+.hero__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: rgba(42, 122, 75, 0.2);
+  border: 1px solid rgba(42, 122, 75, 0.4);
+  color: var(--color-green-glow);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: var(--space-6);
+}
+
+.hero__tag::before {
+  content: '●';
+  font-size: 7px;
+}
+
+.hero__heading {
+  font-size: clamp(46px, 5.5vw, 72px);
+  font-weight: 900;
+  letter-spacing: -2px;
+  color: var(--color-white);
+  margin-bottom: var(--space-6);
+  line-height: 1.05;
+}
+
+.hero__heading em {
+  font-style: italic;
+  color: var(--color-green-glow);
+}
+
+.hero__subheading {
+  font-size: 17px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.75;
+  margin-bottom: var(--space-10);
+  max-width: 480px;
+}
+
+.hero__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+/* Stats row: $100 / 20 min / Local */
+.hero__stats {
+  display: flex;
+  gap: 0;
+  margin-top: 56px;
+  padding-top: var(--space-8);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hero__stat {
+  flex: 1;
+  padding-right: var(--space-6);
+  margin-right: var(--space-6);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hero__stat:last-child {
+  border-right: none;
+  margin-right: 0;
+  padding-right: 0;
+}
+
+.hero__stat-num {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--color-green-glow);
+  letter-spacing: -1px;
+}
+
+.hero__stat-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+
+/* =============================================================================
+   2. Hero Mockup
+   Right column — a styled browser window illustration showing a sample site.
+   Pure CSS and HTML, no images required.
+   ============================================================================= */
+
+.hero__mockup {
+  position: relative;
+}
+
+/* The browser chrome wrapper */
+.mockup-frame {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.4);
+}
+
+/* Traffic light dots + URL bar */
+.mockup-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: var(--space-4);
+}
+
+.mockup-bar__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.mockup-bar__dot--red    { background: #ff5f57; }
+.mockup-bar__dot--yellow { background: #ffbd2e; }
+.mockup-bar__dot--green  { background: #28c840; }
+
+.mockup-bar__url {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 5px;
+  padding: 5px 12px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Simulated website inside the browser chrome */
+.mockup-site {
+  background: var(--color-white);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.mockup-hero {
+  background: linear-gradient(135deg, var(--color-dark), var(--color-charcoal));
+  padding: 18px;
+}
+
+.mockup-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+
+.mockup-nav__logo {
+  width: 18px;
+  height: 18px;
+  background: var(--color-green);
+  border-radius: 3px;
+}
+
+.mockup-nav__links {
+  display: flex;
+  gap: 5px;
+}
+
+.mockup-nav__links span {
+  display: block;
+  width: 20px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+.mockup-nav__btn {
+  width: 44px;
+  height: 16px;
+  background: var(--color-green);
+  border-radius: 3px;
+}
+
+.mockup-headline { font-size: 10px; font-weight: 700; color: var(--color-white); margin-bottom: 4px; line-height: 1.3; }
+.mockup-sub      { font-size: 7px; color: rgba(255, 255, 255, 0.5); margin-bottom: var(--space-2); }
+.mockup-cta      { display: inline-block; background: var(--color-green); padding: 4px 10px; border-radius: 3px; font-size: 7px; font-weight: 700; color: var(--color-white); }
+
+.mockup-body { padding: var(--space-3); }
+
+.mockup-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: var(--space-3);
+}
+
+.mockup-card {
+  background: var(--color-off-white);
+  border-radius: 5px;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+}
+
+.mockup-card__icon        { width: 16px; height: 16px; background: var(--color-green-pale); border-radius: 3px; margin-bottom: 5px; }
+.mockup-card__line        { height: 3px; background: var(--color-border); border-radius: 2px; margin-bottom: 3px; }
+.mockup-card__line--short { width: 55%; }
+
+.mockup-images {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 6px;
+}
+
+.mockup-img               { border-radius: 5px; height: 44px; }
+.mockup-img--primary      { background: var(--color-green-pale); }
+.mockup-img--secondary    { background: var(--color-green-mid); }
+
+/* Floating info badges anchored to the mockup frame */
+.badge {
+  position: absolute;
+  background: var(--color-white);
+  border-radius: 12px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  font-size: 12px;
+  z-index: 2;
+}
+
+.badge--top-left  { top: -16px; left: -20px; }
+.badge--bot-right { bottom: -16px; right: -10px; }
+
+.badge__icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--color-green-pale);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.badge__value { font-weight: 700; color: var(--color-green); font-size: 13px; }
+.badge__label { font-size: 10px; color: var(--color-muted); }
+
+
+/* =============================================================================
+   3. Before / After Section
+   ============================================================================= */
+
+.before-after {
+  padding: 100px 60px;
+  background: var(--color-off-white);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Two equal columns side by side */
+.before-after__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+}
+
+
+/* =============================================================================
+   4. Packages Section
+   ============================================================================= */
+
+.packages {
+  padding: 100px 60px;
+}
+
+/* Four equal columns — one per pricing tier */
+.packages__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+}
+
+
+/* =============================================================================
+   5. About Section
+   Dark background, two-column grid: story left, how-it-works right.
+   ============================================================================= */
+
+.about {
+  padding: 100px 60px;
+  background: var(--color-dark);
+  color: var(--color-white);
+}
+
+.about__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ── Left: brand story ── */
+
+.about__left .section-label       { color: var(--color-green-glow); }
+.about__left .section-label::before { background: var(--color-green-glow); }
+.about__left h2                   { color: var(--color-white); }
+.about__left .section-sub         { color: rgba(255, 255, 255, 0.55); margin-bottom: var(--space-8); }
+
+.about__points { display: flex; flex-direction: column; gap: var(--space-5); }
+
+.about__point {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+}
+
+.about__point-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(42, 122, 75, 0.2);
+  border: 1px solid rgba(42, 122, 75, 0.3);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.about__point-title { font-size: 15px; font-weight: 600; color: var(--color-white); margin-bottom: 4px; }
+.about__point-desc  { font-size: 13px; color: rgba(255, 255, 255, 0.45); line-height: 1.65; }
+
+/* ── Right: how it works ── */
+
+.about__right {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  padding: 36px;
+}
+
+.about__right-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: var(--space-6);
+  color: var(--color-white);
+}
+
+.about__steps { display: flex; flex-direction: column; }
+
+.about__step {
+  display: flex;
+  gap: var(--space-4);
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.about__step:last-child { border-bottom: none; padding-bottom: 0; }
+
+.about__step-num {
+  width: 28px;
+  height: 28px;
+  background: var(--color-green);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--color-white);
+  flex-shrink: 0;
+}
+
+.about__step-title { font-size: 14px; font-weight: 600; color: var(--color-white); margin-bottom: 3px; }
+.about__step-desc  { font-size: 12px; color: rgba(255, 255, 255, 0.4); line-height: 1.55; }
+
+
+/* =============================================================================
+   6. Contact Section
+   Two-column: trust signals left, form right.
+   ============================================================================= */
+
+.contact {
+  padding: 100px 60px;
+}
+
+.contact__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.contact__left h2 { margin-bottom: var(--space-3); }
+
+.contact__points { margin-top: 36px; display: flex; flex-direction: column; gap: var(--space-5); }
+
+.contact__point { display: flex; gap: var(--space-3); align-items: flex-start; }
+
+.contact__point-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--color-green-pale);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.contact__point-title { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+.contact__point-value { font-size: 13px; color: var(--color-muted); }
+.contact__point-value a { color: var(--color-green); font-weight: 600; }
+
+
+/* =============================================================================
+   7. Responsive — Tablet (≤ 1024px)
+   ============================================================================= */
+
+@media (max-width: 1024px) {
+  /* Collapse 4 package columns to 2×2 grid */
+  .packages__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+
+/* =============================================================================
+   8. Responsive — Mobile (≤ 900px)
+   ============================================================================= */
+
+@media (max-width: 900px) {
+
+  /* ── Nav ── */
+  .nav { padding: 16px var(--space-6); }
+  .nav__links { display: none; } /* Mobile nav would require a hamburger menu */
+
+  /* ── Hero ── */
+  .hero__grid {
+    grid-template-columns: 1fr;
+    padding: 80px var(--space-6) 60px;
+    gap: var(--space-10);
+  }
+
+  /* Hide the decorative mockup on mobile — too small to be useful */
+  .hero__mockup { display: none; }
+
+  /* ── All two-column section grids → single column ── */
+  .before-after__grid,
+  .about__grid,
+  .contact__grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* ── Section padding reduction ── */
+  .before-after,
+  .packages,
+  .reviews-cta,
+  .about,
+  .contact {
+    padding: 70px var(--space-6);
+  }
+
+  /* ── Form row → single column ── */
+  .form__row { grid-template-columns: 1fr; }
+
+  /* ── Footer ── */
+  .footer {
+    padding: var(--space-8) var(--space-6);
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+
+/* =============================================================================
+   9. Responsive — Small Mobile (≤ 600px)
+   ============================================================================= */
+
+@media (max-width: 600px) {
+
+  /* Packages → single column */
+  .packages__grid { grid-template-columns: 1fr; }
+
+  /* Hero stats → stacked vertically */
+  .hero__stats {
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .hero__stat {
+    border-right: none;
+    padding-right: 0;
+    margin-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: var(--space-4);
+  }
+
+  .hero__stat:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  /* Modal form → single column */
+  .modal__form-row { grid-template-columns: 1fr; }
+
+  /* Calendly embed height reduction on small screens */
+  .modal__step--calendly .calendly-inline-widget {
+    height: 620px !important;
+  }
+}

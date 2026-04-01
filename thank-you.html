@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Thank You — Evergreen Digital</title>
+
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-X0JSYKGG8L"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-X0JSYKGG8L');
+    gtag('event', 'conversion', {
+      event_category: 'lead',
+      event_label: 'discovery_call_request'
+    });
+  </script>
+
+  <style>
+    /* Page-specific styles — shared variables are redeclared here
+       since this page doesn't load styles.css */
+    :root {
+      --green:       #2a7a4b;
+      --green-light: #35975d;
+      --green-dark:  #1d5c37;
+      --dark:        #0e1a13;
+      --muted:       #607568;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body:    'Outfit', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--dark);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: -20%; right: -10%;
+      width: 600px; height: 600px;
+      background: radial-gradient(ellipse, rgba(42, 122, 75, 0.3) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    body::after {
+      content: '';
+      position: absolute;
+      bottom: -10%; left: -5%;
+      width: 400px; height: 400px;
+      background: radial-gradient(ellipse, rgba(42, 122, 75, 0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 60px 56px;
+      max-width: 560px;
+      width: 100%;
+      text-align: center;
+      animation: fade-up 0.6s ease both;
+    }
+
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 36px;
+    }
+
+    .check {
+      width: 72px; height: 72px;
+      background: rgba(42, 122, 75, 0.2);
+      border: 2px solid rgba(42, 122, 75, 0.5);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 28px;
+      font-size: 32px;
+      animation: pop-in 0.5s 0.3s ease both;
+    }
+
+    @keyframes pop-in {
+      from { opacity: 0; transform: scale(0.6); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+      line-height: 1.1;
+    }
+
+    h1 span {
+      color: #6ee89a;
+      font-style: italic;
+    }
+
+    .intro {
+      font-size: 16px;
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.6);
+      line-height: 1.75;
+      margin-bottom: 36px;
+    }
+
+    .next-steps {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 24px;
+      text-align: left;
+      margin-bottom: 36px;
+    }
+
+    .next-steps__label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #6ee89a;
+      margin-bottom: 16px;
+    }
+
+    .step {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+
+    .step:last-child { margin-bottom: 0; }
+
+    .step__num {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .step__text {
+      font-size: 13.5px;
+      color: rgba(255, 255, 255, 0.65);
+      line-height: 1.6;
+    }
+
+    .step__text strong {
+      color: white;
+      font-weight: 600;
+    }
+
+    .btn-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--green);
+      color: white;
+      padding: 13px 28px;
+      border-radius: 8px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.2s;
+      box-shadow: 0 4px 20px rgba(42, 122, 75, 0.4);
+    }
+
+    .btn-home:hover {
+      background: var(--green-light);
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 600px) {
+      .card { padding: 40px 28px; }
+      h1 { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+
+    <div class="logo">
+      <img src="assets/brand/logo-light.svg" alt="Evergreen Digital" width="180" height="40">
+    </div>
+
+    <div class="check" aria-hidden="true">✓</div>
+
+    <h1>You're all set.<br><span>We'll be in touch.</span></h1>
+
+    <p class="intro">
+      Thanks for reaching out — your request came through. We'll follow up
+      within 24 hours to schedule your free discovery call.
+    </p>
+
+    <div class="next-steps">
+      <div class="next-steps__label">What happens next</div>
+
+      <div class="step">
+        <div class="step__num">1</div>
+        <div class="step__text">
+          <strong>We'll email you within 24 hours</strong> to confirm your call
+          time and send a calendar invite.
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step__num">2</div>
+        <div class="step__text">
+          <strong>On the call</strong> we'll look at your current online presence
+          and tell you exactly what we'd do differently.
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step__num">3</div>
+        <div class="step__text">
+          <strong>You'll get a quote on the spot</strong> — no waiting, no back
+          and forth. Just a clear plan and a price.
+        </div>
+      </div>
+    </div>
+
+    <a href="/" class="btn-home">← Back to Evergreen Digital</a>
+
+  </div>
+
+</body>
+</html>

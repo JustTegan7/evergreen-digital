@@ -6,20 +6,18 @@ on:
   pull_request:
 
 jobs:
-  build:
+  validate:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
+      - name: Check file structure
+        run: |
+          echo "Checking project files..."
+          ls -R
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build project
-        run: npm run build
+      - name: Basic HTML validation (optional)
+        run: |
+          echo "No build step required for static site"

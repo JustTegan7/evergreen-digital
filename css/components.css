@@ -491,6 +491,12 @@
   border: 1.5px solid var(--color-border);
   background: var(--color-white);
   box-shadow: var(--shadow-sm);
+
+  /* Flex column keeps the result bar pinned to the bottom of the card so the
+     two columns line up even if their screenshot stacks differ in height. */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 /* Column header label */
@@ -521,25 +527,42 @@
 .ba-card__screenshots {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-3);
   padding: var(--space-4);
+  flex: 1;
 }
 
+/* Source screenshots range from 0.30 to 1.04 aspect ratio. Rendering them at
+   natural height made one column ~800px taller than the other. Cropping to a
+   fixed tile height with object-fit normalises them; hovering pans down slowly
+   so the rest of the page is still viewable. */
 .ba-card__screenshot {
   width: 100%;
-  height: auto;
+  height: 280px;
+  object-fit: cover;
+  object-position: top center;
   border-radius: 6px;
   border: 1px solid var(--color-border);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   display: block;
+  cursor: zoom-in;
   transition:
-    transform var(--transition-base),
+    object-position 2.5s ease,
     box-shadow var(--transition-base);
 }
 
 .ba-card__screenshot:hover {
-  transform: scale(1.01);
+  object-position: bottom center;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.13);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ba-card__screenshot {
+    transition: box-shadow var(--transition-base);
+  }
+  .ba-card__screenshot:hover {
+    object-position: top center;
+  }
 }
 
 /* Result summary bar at bottom of card */
@@ -1303,4 +1326,132 @@
 .industry__cta:focus-visible {
   outline: 2px solid var(--color-green-dark);
   outline-offset: 2px;
+}
+
+/* =============================================================================
+   Before/After — Staff Portal Highlight
+   -----------------------------------------------------------------------------
+   Full-width band beneath the before/after grid. Used for the one deliverable
+   with no "before" equivalent.
+   ============================================================================= */
+
+.ba-bonus {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: var(--space-10);
+  margin-top: var(--space-6);
+  padding: var(--space-8);
+  background: var(--color-white);
+  border: 1.5px solid var(--color-green-mid);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.ba-bonus__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-green);
+  margin-bottom: var(--space-3);
+}
+
+.ba-bonus__title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-3);
+}
+
+.ba-bonus__desc {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--color-muted);
+}
+
+.ba-bonus__img {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+  display: block;
+  transition: object-position 2.5s ease;
+}
+
+.ba-bonus__img:hover {
+  object-position: bottom center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ba-bonus__img {
+    transition: none;
+  }
+  .ba-bonus__img:hover {
+    object-position: top center;
+  }
+}
+
+/* =============================================================================
+   Service Area Lines
+   -----------------------------------------------------------------------------
+   Visible local-signal copy. Matters twice over: it tells a prospect we're
+   actually nearby, and it gives search engines on-page text to match against
+   the areaServed values in the JSON-LD block.
+   ============================================================================= */
+
+.contact__area {
+  margin-top: var(--space-6);
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-green-pale);
+  border-left: 3px solid var(--color-green);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--color-green-dark);
+}
+
+.footer__area {
+  display: inline-block;
+  margin-top: var(--space-2);
+  font-size: 12px;
+  line-height: 1.6;
+  opacity: 0.7;
+}
+
+/* =============================================================================
+   Reviews — Existing-Client Review Ask
+   -----------------------------------------------------------------------------
+   Deliberately quieter than .reviews-cta__btn. This section is read by
+   prospects; the review request only applies to current clients, so it sits
+   below the primary CTA rather than competing with it.
+   ============================================================================= */
+
+.reviews-cta__client {
+  margin-top: var(--space-6);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.reviews-cta__client a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: var(--space-2);
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  padding-bottom: 2px;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.reviews-cta__client a:hover {
+  color: var(--color-white);
+  border-bottom-color: var(--color-white);
 }

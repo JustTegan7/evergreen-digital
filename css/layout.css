@@ -405,6 +405,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-6);
+  align-items: stretch;
 }
 
 /* =============================================================================
@@ -800,5 +801,29 @@
   }
   .industry__tab {
     flex: 0 0 auto;
+  }
+}
+
+/* ── Staff portal highlight — responsive ───────────────────────────────────── */
+@media (max-width: 900px) {
+  .ba-bonus {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    padding: var(--space-6);
+  }
+  .ba-bonus__title {
+    font-size: 23px;
+  }
+  .ba-bonus__img {
+    height: 240px;
+  }
+}
+
+@media (max-width: 700px) {
+  .ba-card__screenshot {
+    height: 220px;
+  }
+  .ba-bonus__img {
+    height: 200px;
   }
 }

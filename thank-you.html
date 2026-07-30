@@ -27,9 +27,12 @@
       }
       gtag("js", new Date());
       gtag("config", "G-X0JSYKGG8L");
-      gtag("event", "conversion", {
+      // GA4 standard event name, matching the booking modal so both lead paths
+      // aggregate into one metric. lead_source distinguishes them.
+      gtag("event", "generate_lead", {
         event_category: "lead",
         event_label: "discovery_call_request",
+        lead_source: "contact_form",
       });
     </script>
 

@@ -246,9 +246,13 @@ const initBookingModal = () => {
 
     // Fire GA4 lead event if Google Analytics is loaded
     if (typeof gtag === "function") {
-      gtag("event", "lead_captured", {
-        event_category: "funnel",
+      // GA4 standard event name. The contact form fires the same event from
+      // thank-you.html, so both lead paths aggregate into one metric and can
+      // be compared by the lead_source parameter.
+      gtag("event", "generate_lead", {
+        event_category: "lead",
         event_label: lead.service,
+        lead_source: "booking_modal",
         value: 1,
       });
     }

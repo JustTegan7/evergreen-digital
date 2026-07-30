@@ -1,0 +1,13 @@
+# robots.txt for Evergreen Digital
+# https://www.evergreendigitalco.com
+
+User-agent: *
+Allow: /
+
+# Conversion and error pages carry no search value and are marked
+# noindex in their own <head>. Listed here so crawl budget isn't spent
+# on them either.
+Disallow: /thank-you.html
+Disallow: /404.html
+
+Sitemap: https://www.evergreendigitalco.com/sitemap.xml

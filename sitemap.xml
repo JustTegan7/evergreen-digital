@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  sitemap.xml — Evergreen Digital
+  Submit at: https://search.google.com/search-console
+
+  thank-you.html and 404.html are deliberately excluded: both are noindex.
+  When a second case study or any new page ships, add a <url> block here.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <url>
+    <loc>https://www.evergreendigitalco.com/</loc>
+    <lastmod>2026-07-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <url>
+    <loc>https://www.evergreendigitalco.com/privacy-policy.html</loc>
+    <lastmod>2026-07-30</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+</urlset>

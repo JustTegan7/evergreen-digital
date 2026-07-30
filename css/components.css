@@ -20,7 +20,6 @@
    10. Footer
    ============================================================================= */
 
-
 /* =============================================================================
    1. Shared Section Helpers
    Reused across multiple sections for consistent layout and labeling.
@@ -51,7 +50,7 @@
 }
 
 .section-label::before {
-  content: '';
+  content: "";
   width: 28px;
   height: 2px;
   background: var(--color-green);
@@ -68,7 +67,6 @@
   max-width: 520px;
   margin-bottom: var(--space-16);
 }
-
 
 /* =============================================================================
    2. Buttons
@@ -132,7 +130,6 @@
   color: var(--color-white);
   border-color: var(--color-white);
 }
-
 
 /* =============================================================================
    3. Navigation
@@ -220,7 +217,6 @@
   transform: translateY(-1px);
 }
 
-
 /* =============================================================================
    4. Marquee Strip
    Infinite scrolling trust strip between hero and before/after sections.
@@ -265,10 +261,9 @@
   flex-shrink: 0;
 }
 
-
 /* =============================================================================
    5. Package Cards
-   The four pricing tier cards (Starter, Growth, Pro, Elite).
+   The four pricing tier cards (Ultra-Lite, Basic, Growth, Elite).
    The featured card (.pkg-card--featured) uses dark background.
    ============================================================================= */
 
@@ -334,7 +329,11 @@
   white-space: nowrap;
 }
 
-.pkg-card__emoji  { font-size: 24px; margin-bottom: var(--space-2); margin-top: var(--space-2); }
+.pkg-card__emoji {
+  font-size: 24px;
+  margin-bottom: var(--space-2);
+  margin-top: var(--space-2);
+}
 
 .pkg-card__name {
   font-family: var(--font-display);
@@ -344,7 +343,9 @@
   margin-bottom: 4px;
 }
 
-.pkg-card--featured .pkg-card__name { color: var(--color-white); }
+.pkg-card--featured .pkg-card__name {
+  color: var(--color-white);
+}
 
 .pkg-card__tagline {
   font-size: 11px;
@@ -355,9 +356,11 @@
   letter-spacing: 0.5px;
 }
 
-.pkg-card--featured .pkg-card__tagline { color: rgba(255, 255, 255, 0.45); }
+.pkg-card--featured .pkg-card__tagline {
+  color: rgba(255, 255, 255, 0.45);
+}
 
-/* Price display: "from $150 /mo" */
+/* Price display: "from $250 /mo" */
 .pkg-card__price {
   display: flex;
   align-items: baseline;
@@ -365,11 +368,25 @@
   margin-bottom: var(--space-3);
 }
 
-.pkg-card__price-from   { font-size: 11px; color: var(--color-muted); font-weight: 400; }
-.pkg-card__price-amount { font-family: var(--font-display); font-size: 32px; font-weight: 900; color: var(--color-green); }
-.pkg-card__price-per    { font-size: 12px; color: var(--color-muted); }
+.pkg-card__price-from {
+  font-size: 11px;
+  color: var(--color-muted);
+  font-weight: 400;
+}
+.pkg-card__price-amount {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--color-green);
+}
+.pkg-card__price-per {
+  font-size: 12px;
+  color: var(--color-muted);
+}
 
-.pkg-card--featured .pkg-card__price-amount { color: var(--color-green-glow); }
+.pkg-card--featured .pkg-card__price-amount {
+  color: var(--color-green-glow);
+}
 
 /* "Best for:" callout box */
 .pkg-card__best {
@@ -392,7 +409,7 @@
 /* Feature list */
 .pkg-card__features {
   list-style: none;
-  flex: 1;                /* Push CTA to bottom */
+  flex: 1; /* Push CTA to bottom */
   margin-bottom: var(--space-5);
 }
 
@@ -405,11 +422,13 @@
   border-bottom: 1px solid var(--color-border);
 }
 
-.pkg-card__features li:last-child { border-bottom: none; }
+.pkg-card__features li:last-child {
+  border-bottom: none;
+}
 
 /* Green checkmark before each feature */
 .pkg-card__features li::before {
-  content: '✓';
+  content: "✓";
   color: var(--color-green);
   font-weight: 700;
   flex-shrink: 0;
@@ -460,7 +479,6 @@
 .pkg-card--featured .pkg-card__cta:hover {
   background: var(--color-green-light);
 }
-
 
 /* =============================================================================
    6. Before / After Cards
@@ -546,7 +564,6 @@
   color: #8a1a1a;
 }
 
-
 /* =============================================================================
    7. Reviews CTA
    Dark section with Google review call-to-action.
@@ -563,14 +580,18 @@
 
 /* Background glow effect */
 .reviews-cta::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 600px;
   height: 300px;
-  background: radial-gradient(ellipse, rgba(42, 122, 75, 0.2) 0%, transparent 70%);
+  background: radial-gradient(
+    ellipse,
+    rgba(42, 122, 75, 0.2) 0%,
+    transparent 70%
+  );
   pointer-events: none;
 }
 
@@ -605,7 +626,10 @@
   margin-bottom: var(--space-6);
 }
 
-.reviews-cta__stars span { font-size: 28px; color: #f59e0b; }
+.reviews-cta__stars span {
+  font-size: 28px;
+  color: #f59e0b;
+}
 
 .reviews-cta__star-label {
   font-size: 13px;
@@ -651,7 +675,6 @@
   color: var(--color-white);
   flex-shrink: 0;
 }
-
 
 /* =============================================================================
    8. Booking Modal — 2-step lead funnel
@@ -744,7 +767,9 @@
   padding: 44px 48px 40px;
 }
 
-.modal__step[hidden] { display: none; }
+.modal__step[hidden] {
+  display: none;
+}
 
 /* Calendly step gets slightly less horizontal padding */
 .modal__step--calendly {
@@ -752,7 +777,9 @@
 }
 
 /* Header block above form or Calendly */
-.modal__header { margin-bottom: var(--space-6); }
+.modal__header {
+  margin-bottom: var(--space-6);
+}
 
 .modal__label {
   display: block;
@@ -888,7 +915,9 @@
   box-shadow: 0 8px 28px rgba(42, 122, 75, 0.4);
 }
 
-.modal__submit:active { transform: translateY(0); }
+.modal__submit:active {
+  transform: translateY(0);
+}
 
 /* Fine print below submit */
 .modal__disclaimer {
@@ -904,7 +933,6 @@
   border-radius: 12px;
   overflow: hidden;
 }
-
 
 /* =============================================================================
    9. Contact Form
@@ -1002,7 +1030,6 @@
   transform: translateY(-1px);
 }
 
-
 /* =============================================================================
    10. Footer
    ============================================================================= */
@@ -1024,9 +1051,14 @@
   gap: var(--space-2);
 }
 
-.footer__brand img { height: 28px; width: auto; }
+.footer__brand img {
+  height: 28px;
+  width: auto;
+}
 
-.footer__copy { font-size: 12px; }
+.footer__copy {
+  font-size: 12px;
+}
 
 .footer__links {
   display: flex;
@@ -1040,4 +1072,235 @@
   transition: color var(--transition-fast);
 }
 
-.footer__links a:hover { color: var(--color-white); }
+.footer__links a:hover {
+  color: var(--color-white);
+}
+
+/* =============================================================================
+   Add-On Card
+   -----------------------------------------------------------------------------
+   Lighter-weight sibling of .pkg-card. Used in the add-ons catalog grid.
+
+   Usage:
+   * <div class="addon-card">
+   *   <div class="addon-card__emoji">💬</div>
+   *   <h3 class="addon-card__name">SMS + Email Marketing</h3>
+   *   <div class="addon-card__price">$149<span>/mo</span></div>
+   *   <p class="addon-card__desc">...</p>
+   * </div>
+   ============================================================================= */
+
+.addon-card {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  text-align: left;
+  transition:
+    transform var(--transition-base),
+    box-shadow var(--transition-base),
+    border-color var(--transition-base);
+}
+
+.addon-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-green-mid);
+}
+
+.addon-card__emoji {
+  font-size: 22px;
+  margin-bottom: var(--space-3);
+}
+
+.addon-card__name {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+}
+
+.addon-card__price {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--color-green);
+  margin-bottom: var(--space-4);
+}
+
+.addon-card__price span {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-muted);
+}
+
+.addon-card__desc {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--color-muted);
+}
+
+.addon-card__desc em {
+  display: block;
+  margin-top: var(--space-2);
+  font-style: normal;
+  font-weight: 600;
+  color: var(--color-green);
+}
+
+/* =============================================================================
+   Industry Recommender
+   -----------------------------------------------------------------------------
+   Tab strip + result panel. Panel markup is rendered by js/industry.js.
+   ============================================================================= */
+
+.industry {
+  background: var(--color-green-pale);
+  border: 1px solid var(--color-green-mid);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  margin-bottom: var(--space-12);
+  text-align: center;
+}
+
+.industry__prompt {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--space-5);
+}
+
+.industry__tab {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+  background: var(--color-white);
+  border: 1px solid var(--color-green-mid);
+  border-radius: 999px;
+  padding: var(--space-2) var(--space-4);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.industry__tab:hover {
+  border-color: var(--color-green);
+  background: var(--color-white);
+}
+
+.industry__tab.is-active {
+  background: var(--color-green);
+  border-color: var(--color-green);
+  color: var(--color-white);
+}
+
+.industry__tab:focus-visible {
+  outline: 2px solid var(--color-green-dark);
+  outline-offset: 2px;
+}
+
+.industry__result {
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  padding: var(--space-8) var(--space-6);
+  box-shadow: var(--shadow-sm);
+}
+
+.industry__eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-bottom: var(--space-5);
+}
+
+.industry__plan {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-white);
+  background: var(--color-green);
+  border-radius: 999px;
+  padding: var(--space-2) var(--space-5);
+}
+
+.industry__addons {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+}
+
+.industry__addon {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-green-dark);
+  background: var(--color-green-pale);
+  border: 1px solid var(--color-green-mid);
+  border-radius: 999px;
+  padding: var(--space-2) var(--space-4);
+}
+
+.industry__addon::before {
+  content: "+ ";
+  font-weight: 700;
+}
+
+.industry__total {
+  margin: var(--space-6) 0 var(--space-4);
+}
+
+.industry__total-num {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 900;
+  color: var(--color-green);
+}
+
+.industry__total-suffix {
+  font-size: 14px;
+  color: var(--color-muted);
+}
+
+.industry__reason {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--color-muted);
+  max-width: 52ch;
+  margin: 0 auto var(--space-6);
+}
+
+.industry__cta {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-white);
+  background: var(--color-green);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-6);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.industry__cta:hover {
+  background: var(--color-green-light);
+  transform: translateY(-2px);
+}
+
+.industry__cta:focus-visible {
+  outline: 2px solid var(--color-green-dark);
+  outline-offset: 2px;
+}

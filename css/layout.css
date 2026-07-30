@@ -20,7 +20,6 @@
    9.  Responsive — Small   (≤  600px)
    ============================================================================= */
 
-
 /* =============================================================================
    1. Hero Section
    Full-viewport dark section with two-column grid (copy + browser mockup).
@@ -38,25 +37,33 @@
 
 /* Atmospheric radial gradient orbs — purely decorative */
 .hero::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -20%;
   right: -10%;
   width: 700px;
   height: 700px;
-  background: radial-gradient(ellipse, rgba(42, 122, 75, 0.35) 0%, transparent 70%);
+  background: radial-gradient(
+    ellipse,
+    rgba(42, 122, 75, 0.35) 0%,
+    transparent 70%
+  );
   border-radius: 50%;
   pointer-events: none;
 }
 
 .hero::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -10%;
   left: -5%;
   width: 500px;
   height: 500px;
-  background: radial-gradient(ellipse, rgba(42, 122, 75, 0.15) 0%, transparent 70%);
+  background: radial-gradient(
+    ellipse,
+    rgba(42, 122, 75, 0.15) 0%,
+    transparent 70%
+  );
   border-radius: 50%;
   pointer-events: none;
 }
@@ -94,7 +101,7 @@
 }
 
 .hero__tag::before {
-  content: '●';
+  content: "●";
   font-size: 7px;
 }
 
@@ -128,7 +135,7 @@
   flex-wrap: wrap;
 }
 
-/* Stats row: $100 / 20 min / Local */
+/* Stats row: $50 / 20 min / Local */
 .hero__stats {
   display: flex;
   gap: 0;
@@ -165,7 +172,6 @@
   margin-top: 2px;
 }
 
-
 /* =============================================================================
    2. Hero Mockup
    Right column — a styled browser window illustration showing a sample site.
@@ -199,9 +205,15 @@
   border-radius: 50%;
 }
 
-.mockup-bar__dot--red    { background: #ff5f57; }
-.mockup-bar__dot--yellow { background: #ffbd2e; }
-.mockup-bar__dot--green  { background: #28c840; }
+.mockup-bar__dot--red {
+  background: #ff5f57;
+}
+.mockup-bar__dot--yellow {
+  background: #ffbd2e;
+}
+.mockup-bar__dot--green {
+  background: #28c840;
+}
 
 .mockup-bar__url {
   flex: 1;
@@ -258,11 +270,31 @@
   border-radius: 3px;
 }
 
-.mockup-headline { font-size: 10px; font-weight: 700; color: var(--color-white); margin-bottom: 4px; line-height: 1.3; }
-.mockup-sub      { font-size: 7px; color: rgba(255, 255, 255, 0.5); margin-bottom: var(--space-2); }
-.mockup-cta      { display: inline-block; background: var(--color-green); padding: 4px 10px; border-radius: 3px; font-size: 7px; font-weight: 700; color: var(--color-white); }
+.mockup-headline {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-white);
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+.mockup-sub {
+  font-size: 7px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: var(--space-2);
+}
+.mockup-cta {
+  display: inline-block;
+  background: var(--color-green);
+  padding: 4px 10px;
+  border-radius: 3px;
+  font-size: 7px;
+  font-weight: 700;
+  color: var(--color-white);
+}
 
-.mockup-body { padding: var(--space-3); }
+.mockup-body {
+  padding: var(--space-3);
+}
 
 .mockup-cards {
   display: grid;
@@ -278,9 +310,22 @@
   border: 1px solid var(--color-border);
 }
 
-.mockup-card__icon        { width: 16px; height: 16px; background: var(--color-green-pale); border-radius: 3px; margin-bottom: 5px; }
-.mockup-card__line        { height: 3px; background: var(--color-border); border-radius: 2px; margin-bottom: 3px; }
-.mockup-card__line--short { width: 55%; }
+.mockup-card__icon {
+  width: 16px;
+  height: 16px;
+  background: var(--color-green-pale);
+  border-radius: 3px;
+  margin-bottom: 5px;
+}
+.mockup-card__line {
+  height: 3px;
+  background: var(--color-border);
+  border-radius: 2px;
+  margin-bottom: 3px;
+}
+.mockup-card__line--short {
+  width: 55%;
+}
 
 .mockup-images {
   display: grid;
@@ -288,9 +333,16 @@
   gap: 6px;
 }
 
-.mockup-img               { border-radius: 5px; height: 44px; }
-.mockup-img--primary      { background: var(--color-green-pale); }
-.mockup-img--secondary    { background: var(--color-green-mid); }
+.mockup-img {
+  border-radius: 5px;
+  height: 44px;
+}
+.mockup-img--primary {
+  background: var(--color-green-pale);
+}
+.mockup-img--secondary {
+  background: var(--color-green-mid);
+}
 
 /* Floating info badges anchored to the mockup frame */
 .badge {
@@ -306,8 +358,14 @@
   z-index: 2;
 }
 
-.badge--top-left  { top: -16px; left: -20px; }
-.badge--bot-right { bottom: -16px; right: -10px; }
+.badge--top-left {
+  top: -16px;
+  left: -20px;
+}
+.badge--bot-right {
+  bottom: -16px;
+  right: -10px;
+}
 
 .badge__icon {
   width: 30px;
@@ -321,9 +379,15 @@
   flex-shrink: 0;
 }
 
-.badge__value { font-weight: 700; color: var(--color-green); font-size: 13px; }
-.badge__label { font-size: 10px; color: var(--color-muted); }
-
+.badge__value {
+  font-weight: 700;
+  color: var(--color-green);
+  font-size: 13px;
+}
+.badge__label {
+  font-size: 10px;
+  color: var(--color-muted);
+}
 
 /* =============================================================================
    3. Before / After Section
@@ -343,7 +407,6 @@
   gap: var(--space-6);
 }
 
-
 /* =============================================================================
    4. Packages Section
    ============================================================================= */
@@ -358,7 +421,6 @@
   grid-template-columns: repeat(4, 1fr);
   gap: var(--space-4);
 }
-
 
 /* =============================================================================
    5. About Section
@@ -382,12 +444,25 @@
 
 /* ── Left: brand story ── */
 
-.about__left .section-label       { color: var(--color-green-glow); }
-.about__left .section-label::before { background: var(--color-green-glow); }
-.about__left h2                   { color: var(--color-white); }
-.about__left .section-sub         { color: rgba(255, 255, 255, 0.55); margin-bottom: var(--space-8); }
+.about__left .section-label {
+  color: var(--color-green-glow);
+}
+.about__left .section-label::before {
+  background: var(--color-green-glow);
+}
+.about__left h2 {
+  color: var(--color-white);
+}
+.about__left .section-sub {
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: var(--space-8);
+}
 
-.about__points { display: flex; flex-direction: column; gap: var(--space-5); }
+.about__points {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
 
 .about__point {
   display: flex;
@@ -408,8 +483,17 @@
   flex-shrink: 0;
 }
 
-.about__point-title { font-size: 15px; font-weight: 600; color: var(--color-white); margin-bottom: 4px; }
-.about__point-desc  { font-size: 13px; color: rgba(255, 255, 255, 0.45); line-height: 1.65; }
+.about__point-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-white);
+  margin-bottom: 4px;
+}
+.about__point-desc {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.65;
+}
 
 /* ── Right: how it works ── */
 
@@ -428,7 +512,10 @@
   color: var(--color-white);
 }
 
-.about__steps { display: flex; flex-direction: column; }
+.about__steps {
+  display: flex;
+  flex-direction: column;
+}
 
 .about__step {
   display: flex;
@@ -437,7 +524,10 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.about__step:last-child { border-bottom: none; padding-bottom: 0; }
+.about__step:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
 
 .about__step-num {
   width: 28px;
@@ -453,9 +543,17 @@
   flex-shrink: 0;
 }
 
-.about__step-title { font-size: 14px; font-weight: 600; color: var(--color-white); margin-bottom: 3px; }
-.about__step-desc  { font-size: 12px; color: rgba(255, 255, 255, 0.4); line-height: 1.55; }
-
+.about__step-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-white);
+  margin-bottom: 3px;
+}
+.about__step-desc {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.55;
+}
 
 /* =============================================================================
    6. Contact Section
@@ -475,11 +573,22 @@
   margin: 0 auto;
 }
 
-.contact__left h2 { margin-bottom: var(--space-3); }
+.contact__left h2 {
+  margin-bottom: var(--space-3);
+}
 
-.contact__points { margin-top: 36px; display: flex; flex-direction: column; gap: var(--space-5); }
+.contact__points {
+  margin-top: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
 
-.contact__point { display: flex; gap: var(--space-3); align-items: flex-start; }
+.contact__point {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
 
 .contact__point-icon {
   width: 36px;
@@ -493,10 +602,19 @@
   flex-shrink: 0;
 }
 
-.contact__point-title { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
-.contact__point-value { font-size: 13px; color: var(--color-muted); }
-.contact__point-value a { color: var(--color-green); font-weight: 600; }
-
+.contact__point-title {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.contact__point-value {
+  font-size: 13px;
+  color: var(--color-muted);
+}
+.contact__point-value a {
+  color: var(--color-green);
+  font-weight: 600;
+}
 
 /* =============================================================================
    7. Responsive — Tablet (≤ 1024px)
@@ -509,16 +627,18 @@
   }
 }
 
-
 /* =============================================================================
    8. Responsive — Mobile (≤ 900px)
    ============================================================================= */
 
 @media (max-width: 900px) {
-
   /* ── Nav ── */
-  .nav { padding: 16px var(--space-6); }
-  .nav__links { display: none; } /* Mobile nav would require a hamburger menu */
+  .nav {
+    padding: 16px var(--space-6);
+  }
+  .nav__links {
+    display: none;
+  } /* Mobile nav would require a hamburger menu */
 
   /* ── Hero ── */
   .hero__grid {
@@ -528,7 +648,9 @@
   }
 
   /* Hide the decorative mockup on mobile — too small to be useful */
-  .hero__mockup { display: none; }
+  .hero__mockup {
+    display: none;
+  }
 
   /* ── All two-column section grids → single column ── */
   .before-after__grid,
@@ -547,7 +669,9 @@
   }
 
   /* ── Form row → single column ── */
-  .form__row { grid-template-columns: 1fr; }
+  .form__row {
+    grid-template-columns: 1fr;
+  }
 
   /* ── Footer ── */
   .footer {
@@ -557,15 +681,15 @@
   }
 }
 
-
 /* =============================================================================
    9. Responsive — Small Mobile (≤ 600px)
    ============================================================================= */
 
 @media (max-width: 600px) {
-
   /* Packages → single column */
-  .packages__grid { grid-template-columns: 1fr; }
+  .packages__grid {
+    grid-template-columns: 1fr;
+  }
 
   /* Hero stats → stacked vertically */
   .hero__stats {
@@ -587,10 +711,94 @@
   }
 
   /* Modal form → single column */
-  .modal__form-row { grid-template-columns: 1fr; }
+  .modal__form-row {
+    grid-template-columns: 1fr;
+  }
 
   /* Calendly embed height reduction on small screens */
   .modal__step--calendly .calendly-inline-widget {
     height: 620px !important;
+  }
+}
+
+/* =============================================================================
+   Add-Ons Section
+   ============================================================================= */
+
+.addons {
+  padding: var(--space-24) var(--space-6);
+  background: var(--color-cream);
+}
+
+.addons__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-5);
+  margin-top: var(--space-10);
+}
+
+.addons__note {
+  margin-top: var(--space-8);
+  font-size: 13px;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+/* Industry recommender — tab strip layout */
+.industry__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: center;
+  margin-bottom: var(--space-8);
+}
+
+.industry__stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* ── Tablet ───────────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .addons__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Mobile ───────────────────────────────────────────────────────────────── */
+@media (max-width: 700px) {
+  .addons {
+    padding: var(--space-16) var(--space-4);
+  }
+  .addons__grid {
+    grid-template-columns: 1fr;
+  }
+  .industry {
+    padding: var(--space-6) var(--space-4);
+  }
+  .industry__result {
+    padding: var(--space-6) var(--space-4);
+  }
+  .industry__total-num {
+    font-size: 32px;
+  }
+
+  /* Horizontally scrollable tab strip so six industries stay reachable
+     without wrapping into a tall stack on small screens. */
+  .industry__tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding-bottom: var(--space-2);
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .industry__tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .industry__tab {
+    flex: 0 0 auto;
   }
 }

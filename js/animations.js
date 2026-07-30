@@ -14,7 +14,7 @@
  * CSS counterpart: .reveal, .reveal-left, .reveal-right in animations.css
  */
 
-'use strict';
+"use strict";
 
 // ─── Scroll Reveal ────────────────────────────────────────────────────────────
 
@@ -30,7 +30,7 @@
  * but is also intentional for simplicity in a static site context.
  */
 const initScrollReveal = () => {
-  const revealSelectors = '.reveal, .reveal-left, .reveal-right';
+  const revealSelectors = ".reveal, .reveal-left, .reveal-right";
   const elements = document.querySelectorAll(revealSelectors);
 
   if (!elements.length) return;
@@ -39,18 +39,17 @@ const initScrollReveal = () => {
     (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
+          entry.target.classList.add("is-visible");
         }
       });
     },
     {
       threshold: 0.12, // Trigger when 12% of element is visible
-    }
+    },
   );
 
   elements.forEach((el) => observer.observe(el));
 };
-
 
 // ─── Animated Counters ────────────────────────────────────────────────────────
 
@@ -64,15 +63,15 @@ const initScrollReveal = () => {
  *   data-suffix=" min"   — Optional suffix (e.g. unit of measure)
  *
  * Example:
- *   <span data-count="100" data-prefix="$">$100</span>
+ *   <span data-count="50" data-prefix="$">$50</span>
  *   <span data-count="20"  data-suffix=" min">20 min</span>
  *
  * @param {HTMLElement} el — The element to animate
  */
 const animateCounter = (el) => {
-  const target   = parseInt(el.dataset.count, 10);
-  const prefix   = el.dataset.prefix || '';
-  const suffix   = el.dataset.suffix || '';
+  const target = parseInt(el.dataset.count, 10);
+  const prefix = el.dataset.prefix || "";
+  const suffix = el.dataset.suffix || "";
   const duration = 1200; // Total animation duration in ms
 
   const startTime = performance.now();
@@ -85,11 +84,11 @@ const animateCounter = (el) => {
    * @param {number} currentTime — DOMHighResTimeStamp from requestAnimationFrame
    */
   const update = (currentTime) => {
-    const elapsed  = currentTime - startTime;
+    const elapsed = currentTime - startTime;
     const progress = Math.min(elapsed / duration, 1); // Clamp to [0, 1]
 
     // Ease-out cubic: f(t) = 1 - (1 - t)³
-    const eased  = 1 - Math.pow(1 - progress, 3);
+    const eased = 1 - Math.pow(1 - progress, 3);
     const current = Math.round(eased * target);
 
     el.textContent = `${prefix}${current}${suffix}`;
@@ -110,7 +109,7 @@ const animateCounter = (el) => {
  * then the observer stops watching it (unobserve) to avoid re-triggering.
  */
 const initCounters = () => {
-  const counters = document.querySelectorAll('[data-count]');
+  const counters = document.querySelectorAll("[data-count]");
 
   if (!counters.length) return;
 
@@ -123,7 +122,7 @@ const initCounters = () => {
         }
       });
     },
-    { threshold: 0.5 } // Counter starts when 50% visible
+    { threshold: 0.5 }, // Counter starts when 50% visible
   );
 
   counters.forEach((el) => observer.observe(el));

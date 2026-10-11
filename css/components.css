@@ -360,7 +360,7 @@
   color: rgba(255, 255, 255, 0.45);
 }
 
-/* Price display: "from $250 /mo" */
+/* Price display: "$150 /mo" */
 .pkg-card__price {
   display: flex;
   align-items: baseline;
@@ -384,8 +384,19 @@
   color: var(--color-muted);
 }
 
+/* Setup fee + term line under the price */
+.pkg-card__terms {
+  font-size: 11.5px;
+  color: var(--color-muted);
+  margin-top: calc(var(--space-3) * -0.5);
+  margin-bottom: var(--space-3);
+}
+
 .pkg-card--featured .pkg-card__price-amount {
   color: var(--color-green-glow);
+}
+.pkg-card--featured .pkg-card__terms {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 /* "Best for:" callout box */

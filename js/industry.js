@@ -1,21 +1,23 @@
 /* =============================================================================
-   industry.js — Industry Package Recommender
+   industry.js, Industry Package Recommender
    Evergreen Digital · evergreendigitalco.com
    =============================================================================
 
    Renders a recommended plan + add-on bundle for the selected industry.
 
-   IMPORTANT — keep this in sync with the internal pricing master sheet.
+   IMPORTANT, keep this in sync with the internal pricing master sheet.
    The `total` value is NOT calculated at runtime; it is written by hand so a
    typo here will not silently produce a wrong price on a live page. If you
    change a plan or add-on price, update the matching total below and re-check
    the arithmetic in the comment beside it.
 
-   Reference prices (July 30, 2026):
-     Ultra-Lite $50 · Basic $149 · Growth $250 · Elite $450
-     SMS + Email $149 · Lead CRM $299 · Google Ads $350 · eCommerce $149 + 2.5%
-     Reputation $149 · Business Portal $199–299 · AI Receptionist from $249
-     Photo + Video quoted per shoot
+   Reference prices (Oct 11, 2026):
+     Ultra-Lite $30 · Basic $50 · Growth $150 · Elite $350
+     Setup: $500 · $1,000 · $1,500 · $2,000 (Ultra-Lite/Basic on 6-month term)
+     SMS + Email $79 · Reputation $49 (incl. Elite) · Social $199
+     Ads $249 · Lead CRM $149 · AI Receptionist from $149
+     eCommerce $79 + 2.5% · Business Portal from $149 · Extra edits $60/hr
+     Photo + Video quoted per shoot. No Elite add-on discount.
    ============================================================================= */
 
 "use strict";
@@ -25,40 +27,40 @@ const INDUSTRY_PACKAGES = {
     label: "Home Services",
     plan: "Growth",
     addons: ["SMS + Email Marketing", "Lead CRM + Routing"],
-    total: "$698", // 250 + 149 + 299
+    total: "$378", // 150 + 79 + 149
     suffix: "/mo",
     reason:
       "Trades live and die by the schedule. Automated reminders cut no-shows " +
-      "by 25–30%, and routed leads mean the 7am call never sits unanswered " +
+      "by 25 to 30%, and routed leads mean the 7am call never sits unanswered " +
       "while you\u2019re under a sink.",
   },
   salons: {
     label: "Salons & Spas",
     plan: "Growth",
     addons: ["SMS + Email Marketing", "Photo + Video"],
-    total: "$399", // 250 + 149  (+ video quoted per shoot)
+    total: "$229", // 150 + 79  (+ video quoted per shoot)
     suffix: "/mo + shoots",
     reason:
       "People book a salon with their eyes. Real photography and video of " +
-      "your actual work converts far better than stock imagery — and text " +
+      "your actual work converts far better than stock imagery, and text " +
       "reminders keep the chair full.",
   },
   retail: {
     label: "Retail & eCommerce",
     plan: "Elite",
     addons: ["eCommerce Storefront"],
-    total: "$599", // 450 + 149  (+ 2.5% of transactions)
+    total: "$429", // 350 + 79  (+ 2.5% of transactions)
     suffix: "/mo + 2.5%",
     reason:
-      "Most agencies take 5–8% of every sale. We take 2.5%. On $50k a month " +
-      "in sales that difference is roughly $15,000 a year — which usually " +
+      "Most agencies take 5 to 8% of every sale. We take 2.5%. On $50k a month " +
+      "in sales that difference is roughly $15,000 a year, which usually " +
       "pays for the entire plan several times over.",
   },
   professional: {
     label: "Professional Services",
     plan: "Growth",
-    addons: ["Google Ads Management", "SMS + Email Marketing"],
-    total: "$749", // 250 + 350 + 149
+    addons: ["Google or Meta Ads Management", "SMS + Email Marketing"],
+    total: "$478", // 150 + 249 + 79
     suffix: "/mo",
     reason:
       "When someone searches for a lawyer or an accountant, they are ready " +
@@ -69,10 +71,10 @@ const INDUSTRY_PACKAGES = {
     label: "Gyms & Fitness",
     plan: "Growth",
     addons: ["SMS + Email Marketing", "Custom Business Portal"],
-    total: "$648", // 250 + 149 + 249
+    total: "$378", // 150 + 79 + 149 (portal from $149)
     suffix: "/mo",
     reason:
-      "Signing members is the easy part — keeping them is the business. A " +
+      "Signing members is the easy part, keeping them is the business. A " +
       "member portal plus consistent check-ins is what turns a January " +
       "signup into a paying member in June.",
   },
@@ -80,7 +82,7 @@ const INDUSTRY_PACKAGES = {
     label: "Churches & Nonprofits",
     plan: "Growth",
     addons: ["SMS + Email Marketing", "Reputation Monitoring"],
-    total: "$548", // 250 + 149 + 149
+    total: "$278", // 150 + 79 + 49
     suffix: "/mo",
     reason:
       "Giving follows trust. Being easy to find, easy to contact, and " +

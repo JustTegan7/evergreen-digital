@@ -1,0 +1,11 @@
+{
+  "name": "evergreen-digital",
+  "private": true,
+  "type": "module",
+  "description": "Evergreen Digital marketing site. Static HTML/CSS/JS plus two Vercel serverless functions in /api. No dependencies.",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "dev": "node scripts/dev-server.mjs",
+    "pages": "node scripts/build-landing-pages.mjs"
+  }
+}

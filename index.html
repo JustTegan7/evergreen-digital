@@ -153,8 +153,9 @@
       </a>
 
       <div class="nav__links">
+        <a href="#audit">Free Site Check</a>
         <a href="#work">Our Work</a>
-        <a href="#reviews">Reviews</a>
+        <a href="#showcase">Demos</a>
         <a href="#services">Packages</a>
         <a href="#addons">Add-Ons</a>
         <a href="#about">About</a>
@@ -195,7 +196,7 @@
             >
               Book a Free Discovery Call →
             </button>
-            <a href="#services" class="btn-ghost">See Packages ↓</a>
+            <a href="#audit" class="btn-ghost">Free Website Check ↓</a>
           </div>
 
           <div class="hero__stats reveal reveal-delay-4">
@@ -358,6 +359,40 @@
     </div>
 
     <!-- =====================================================================
+       Free Website Check (lead magnet)
+       Widget is rendered by js/audit.js and backed by /api/audit + /api/unlock.
+       Teaser (score + top issues) is free; email unlocks the full report and
+       emails the lead to the team. Deep link: /#audit?site=example.com
+       ===================================================================== -->
+    <section class="audit" id="audit" aria-label="Free website check">
+      <div class="section-wrap audit__grid">
+        <div class="audit__intro">
+          <p class="section-label reveal">Free Website Check</p>
+          <h2 class="reveal">How is your website<br />actually doing?</h2>
+          <p class="section-sub reveal">
+            Enter your address and get a score in about 30 seconds. We check
+            the things that cost local businesses customers, in plain English.
+          </p>
+          <ul class="audit__list reveal">
+            <li>Speed and layout on phones</li>
+            <li>A clear way to call or book</li>
+            <li>Security, reviews, and trust signals</li>
+            <li>What Google sees when it looks at you</li>
+            <li>Broken links and missing basics</li>
+          </ul>
+        </div>
+
+        <div class="audit-card reveal-right">
+          <p class="audit-card__title">Check your site, free</p>
+          <p class="audit-card__sub">
+            No signup to see your score. Works on any website.
+          </p>
+          <div data-audit-widget aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
        Before / After — Real Barclay's Salon screenshots
        Before: old WordPress site (2 images)
        After:  new Evergreen redesign (2 images)
@@ -450,6 +485,26 @@
             class="ba-bonus__img"
           />
         </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+       Demo Showcase: "Choose your business"
+       Chips + panel are rendered by js/showcase.js (edit BUSINESSES there to
+       add demo links). Deep link: /#showcase?biz=auto-detailing
+       ===================================================================== -->
+    <section class="showcase" id="showcase" aria-label="Demo sites by business type">
+      <div class="section-wrap">
+        <p class="section-label reveal">See It For Your Business</p>
+        <h2 class="reveal">Don't know where to start?<br />Choose your business.</h2>
+        <p class="section-sub reveal">
+          Pick what you do and see the kind of site we'd build, the pages it
+          would have, and the plan we'd recommend. Flip between plans to
+          compare.
+        </p>
+
+        <div class="sc-chips reveal" role="tablist" aria-label="Business type"></div>
+        <div class="sc-panel" id="sc-panel" role="tabpanel" aria-live="polite"></div>
       </div>
     </section>
 

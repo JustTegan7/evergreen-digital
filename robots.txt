@@ -10,4 +10,8 @@ Allow: /
 Disallow: /thank-you.html
 Disallow: /404.html
 
+# Serverless endpoints and the internal footer-credit kit
+Disallow: /api/
+Disallow: /credit/
+
 Sitemap: https://www.evergreendigitalco.com/sitemap.xml

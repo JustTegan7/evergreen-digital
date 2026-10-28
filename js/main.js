@@ -10,6 +10,9 @@
  *   nav.js         → Navigation scroll shadow
  *   animations.js  → Scroll reveal + animated counters
  *   modal.js       → 2-step booking modal (lead form + Calendly embed)
+ *   audit.js       → Free website check widget ([data-audit-widget])
+ *   showcase.js    → "Choose your business" demo showcase
+ *   industry.js    → Add-on recommender (self-initialising)
  *
  * Why ES modules?
  * ───────────────
@@ -26,6 +29,9 @@
 import { initNavShadow }               from './nav.js';
 import { initScrollReveal, initCounters } from './animations.js';
 import { initBookingModal }            from './modal.js';
+import { initAuditWidgets }            from './audit.js';
+import { initShowcase }                from './showcase.js';
+import './industry.js';               // self-initialising; was never loaded before
 
 // ─── Initialise all modules ───────────────────────────────────────────────────
 // Modules execute after DOM parsing is complete (ES module default behaviour).
@@ -34,3 +40,5 @@ initNavShadow();      // Attach nav scroll shadow listener
 initScrollReveal();   // Observe + reveal elements as they enter viewport
 initCounters();       // Animate numeric stats on first viewport entry
 initBookingModal();   // Wire up the 2-step booking modal funnel
+initAuditWidgets();   // Free website check (homepage + landing pages)
+initShowcase();       // "Choose your business" demo showcase

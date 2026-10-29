@@ -205,3 +205,12 @@ p {
   outline-offset: 3px;
   border-radius: 3px;
 }
+
+
+/* Slide-in reveal animations start off-screen; never let them cause
+   sideways scrolling on phones. `clip` (unlike `hidden`) keeps sticky
+   positioning working. */
+html,
+body {
+  overflow-x: clip;
+}

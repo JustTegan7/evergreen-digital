@@ -1466,3 +1466,22 @@
   color: var(--color-white);
   border-bottom-color: var(--color-white);
 }
+
+/* Live-site links in the Our Work section */
+.before-after .section-sub a,
+.ba-bonus__link {
+  color: var(--color-green);
+  font-weight: 600;
+}
+
+.ba-bonus__link {
+  display: inline-block;
+  margin-top: var(--space-4);
+  font-size: 15px;
+  text-decoration: none;
+  border-bottom: 1.5px solid var(--color-green-mid);
+}
+
+.ba-bonus__link:hover {
+  border-color: var(--color-green);
+}

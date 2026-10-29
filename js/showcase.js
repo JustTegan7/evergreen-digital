@@ -17,6 +17,8 @@
    Edit the BUSINESSES list below. For each type:
      demoUrl     Live demo link. Leave "" until the demo is deployed and the
                  card shows a styled "demo in progress" preview instead.
+     linkText    Optional label for the demo link (defaults to "View <clientName>,
+                 a real client site" or "Open the live demo").
      image       Optional screenshot (1280×800 works well), e.g.
                  "/assets/images/demos/coffee.webp". Falls back to the
                  styled preview when empty.
@@ -100,8 +102,9 @@ const BUSINESSES = [
     why: "A portfolio is the first thing a recruiter, client, or collaborator checks after your name. A fast, clean site at your own domain looks more serious than a social profile, and it stays yours.",
     pages: ["Home", "Work", "Contact", "About", "Resume", "Blog"],
     addon: "Extra edit time when you add new work",
-    demoUrl: "", // Optional: Tegan's own portfolio as a real example
-    image: "",
+    demoUrl: "https://www.teganrogers.org/",
+    image: "/assets/images/work/teganrogers.webp",
+    linkText: "See Tegan's portfolio, built by us",
     tierParam: false,
     brand: { name: "Jordan Lee", tagline: "Designer & developer", bg: "#f5f5f2", accent: "#2a7a4b", cta: "See My Work", light: true },
   },
@@ -114,8 +117,9 @@ const BUSINESSES = [
     why: "Your work is the website. A fast gallery that gets out of the way, a short about, and an easy way to inquire or book are all most artists and photographers need to start.",
     pages: ["Gallery", "About", "Contact", "Exhibitions", "Prints", "Blog"],
     addon: "eCommerce Storefront when you're ready to sell prints",
-    demoUrl: "", // Dale W Reiger Gallery demo: add URL when ready to show
-    image: "",
+    demoUrl: "https://www.sarahdenby.com/",
+    image: "/assets/images/work/sarahdenby.webp",
+    clientName: "Sarah Denby",
     tierParam: false,
     brand: { name: "Lumen Studio", tagline: "Photography, Pacific Northwest", bg: "#141414", accent: "#e8e2d4", cta: "View the Gallery" },
   },
@@ -206,8 +210,9 @@ const BUSINESSES = [
     why: "Hungry people decide in under a minute. A menu that works on a phone, current hours, and one tap to call or order are what get them through the door.",
     pages: ["Home", "Menu", "Catering", "About", "Hours & Location", "Order"],
     addon: "SMS + Email Marketing for specials",
-    demoUrl: "", // Tata's demo: add URL once the owner is OK with it being shown publicly
-    image: "",
+    demoUrl: "https://tatas-mexican-restaurant.vercel.app/",
+    image: "/assets/images/work/tatas.webp",
+    linkText: "Open our demo for Tata's Mexican Restaurant",
     tierParam: false,
     brand: { name: "Casa Verde Cantina", tagline: "Family recipes since 1998", bg: "#2d3b1f", accent: "#e8b04a", cta: "View the Menu" },
   },
@@ -219,8 +224,9 @@ const BUSINESSES = [
     why: "Hobby stores run on community. An events calendar, what's in stock, and a place to sign up for tournaments keep regulars coming back every week.",
     pages: ["Home", "Events", "Shop", "Leagues", "About", "Visit Us"],
     addon: "SMS + Email Marketing for event nights",
-    demoUrl: "", // Moon Dragon Games demo: add URL when ready to show
-    image: "",
+    demoUrl: "https://reloved-website-chi.vercel.app/",
+    image: "/assets/images/work/reloved.webp",
+    clientName: "ReLoved Gaming",
     tierParam: false,
     brand: { name: "Hoard & Dice Games", tagline: "Board games, cards & minis", bg: "#1d1533", accent: "#a78bfa", cta: "See This Week's Events" },
   },
@@ -253,7 +259,7 @@ function preview(biz, tier) {
   const pagesShown = biz.pages.slice(0, Math.min(biz.pages.length, TIERS[tier].pages));
 
   const body = biz.image
-    ? `<img class="sc-preview__img" src="${esc(biz.image)}" alt="${esc(biz.clientName || b.name)} website preview" loading="lazy" />`
+    ? `<img class="sc-preview__img" src="${esc(biz.image)}" alt="${esc(biz.clientName || biz.linkText || b.name)} website preview" loading="lazy" />`
     : `<div class="sc-mock ${b.light ? "sc-mock--light" : ""}" style="--mock-bg:${b.bg};--mock-accent:${b.accent}">
          <div class="sc-mock__nav">
            <span class="sc-mock__logo">${esc(b.name)}</span>
@@ -280,7 +286,7 @@ function preview(biz, tier) {
     ${
       href
         ? `<a class="sc-demo-btn" href="${esc(href)}" target="_blank" rel="noopener" data-demo-link>
-             ${biz.clientName ? `View ${esc(biz.clientName)}, a real client site` : "Open the live demo"} ↗
+             ${esc(biz.linkText || (biz.clientName ? `View ${biz.clientName}, a real client site` : "Open the live demo"))} ↗
            </a>`
         : `<p class="sc-demo-note">Demo site in progress. Want a walkthrough of what yours could look like? <button type="button" class="sc-inline-link" data-modal-trigger aria-haspopup="dialog">Book a free call</button>.</p>`
     }`;

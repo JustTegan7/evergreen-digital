@@ -331,7 +331,12 @@ const nav = `
         <a href="/#services">Packages</a>
         <a href="/websites/">Industries</a>
       </div>
-      <a class="nav__cta" href="/#contact">Book a Free Call →</a>
+      <div class="nav__actions">
+        <a class="nav__phone" href="tel:+12532545368" aria-label="Call Evergreen Digital at (253) 254-5368">
+          <span aria-hidden="true">📞</span><span class="nav__phone-num">(253) 254-5368</span>
+        </a>
+        <a class="nav__cta" href="/#contact">Book a Free Call →</a>
+      </div>
     </nav>`;
 
 function footer(currentSlug) {
@@ -490,6 +495,7 @@ ${auditBlock(p)}
           <h2>Let's talk about your ${esc(p.nicheShort)} website.</h2>
           <p>Free 20-minute call. We'll look at what you have now and tell you exactly what we'd change. Based in Mill Creek, serving ${esc(p.city === "Snohomish County" ? NEARBY : p.city + " and all of Snohomish County")}.</p>
           <a class="btn-primary" href="/#contact">Book a Free Call →</a>
+          <p class="lp-cta__phone">Or call or text <a href="tel:+12532545368">(253) 254-5368</a></p>
         </div>
       </section>
     </main>

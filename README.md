@@ -1,7 +1,7 @@
 # Evergreen Digital
 
 **Live site:** [evergreendigitalco.com](https://www.evergreendigitalco.com)  
-**Developer:** [Tegan Rogers](https://www.teganrogers.net/)  
+**Developer:** [Tegan Rogers](https://www.teganrogers.org/)  
 **Stack:** HTML5 · CSS3 · Vanilla JavaScript (ES Modules)  
 **Build tooling:** None — zero dependencies, no bundler required
 
@@ -195,4 +195,4 @@ See [`docs/CASE_STUDY.md`](docs/CASE_STUDY.md) for a full writeup of the Barclay
 
 ---
 
-*Built by [Tegan Rogers](https://www.teganrogers.net/) · Washington, USA*
+*Built by [Tegan Rogers](https://www.teganrogers.org/) · Washington, USA*

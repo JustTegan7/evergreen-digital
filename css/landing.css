@@ -326,3 +326,13 @@ a.nav__cta {
     align-items: flex-start;
   }
 }
+
+.lp-cta__phone {
+  margin: var(--space-5) auto 0 !important;
+  font-size: 15px;
+}
+
+.lp-cta__phone a {
+  color: var(--color-white);
+  font-weight: 600;
+}

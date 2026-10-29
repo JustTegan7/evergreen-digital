@@ -1485,3 +1485,54 @@
 .ba-bonus__link:hover {
   border-color: var(--color-green);
 }
+
+/* Phone number in nav + footer (Google Voice business line) */
+.nav__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.nav__phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav__phone:hover {
+  color: var(--color-green);
+}
+
+.footer__phone {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+}
+
+.footer__phone:hover {
+  color: var(--color-white);
+}
+
+/* Nav gets crowded below ~1200px: show the phone icon only */
+@media (max-width: 1200px) {
+  .nav__phone-num {
+    display: none;
+  }
+  .nav__phone {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .nav__actions {
+    gap: var(--space-3);
+  }
+  .nav__cta {
+    padding: 9px 14px;
+    font-size: 13px;
+  }
+}

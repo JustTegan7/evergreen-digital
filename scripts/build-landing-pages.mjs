@@ -173,7 +173,7 @@ const PAGES = [
       "Local SEO for Mill Creek and nearby cities",
     ],
     faqs: [
-      { q: "We already use a booking app. Can we keep it?", a: "Yes. We connect your existing booking tool so your calendar and client history stay exactly where they are. For Barclay's Salon we also built a custom staff portal, which is available as an add-on." },
+      { q: "We already use a booking app. Can we keep it?", a: "Yes. We connect your existing booking tool so your calendar and client history stay exactly where they are. For Barclay's Salon, every Book button goes straight to the booking system they already used." },
       { q: "Can you take photos of our work?", a: "Yes. Photo and video is available as an add-on, quoted per shoot. Real photos of your space and work convert far better than stock images." },
       FAQ_PRICE,
       FAQ_LOCAL("Mill Creek"),

@@ -47,6 +47,40 @@ const FAQ_LOCAL = (city) => ({
 
 const PAGES = [
   {
+    slug: "portfolio-websites-snohomish-county",
+    niche: "Artists, Photographers & Portfolios",
+    nicheShort: "portfolio",
+    city: "Snohomish County",
+    showcase: "portfolio",
+    plan: "Ultra-Lite",
+    problemsHeading: "Why your work deserves its own site",
+    title: "Portfolio Websites from $30/mo | Artists & Photographers | Evergreen Digital",
+    description:
+      "Portfolio websites for artists, photographers, designers, and job seekers in Snohomish County. Your own domain, a fast gallery, and hosting included from $30/mo.",
+    h1: "Portfolio websites for artists, photographers, and creatives",
+    intro:
+      "You don't need a business to need a website. A clean portfolio at your own name shows your work better than any social profile, and with our Ultra-Lite plan it's $30 a month with hosting, security, and backups included.",
+    problems: [
+      ["Your work is scattered", "Instagram, Behance, a Google Drive link, a PDF resume. One site at your own name pulls it together so people see your best work first, every time."],
+      ["Site builders eat your weekends", "Template builders look easy until you're fighting a layout at midnight. We build it for you from layouts that already work, so you can get back to the actual work."],
+      ["Social platforms aren't yours", "Algorithms change and accounts get buried. Your own site, at your own domain, is the one place online you fully control."],
+    ],
+    includes: [
+      "1 to 3 pages: gallery or work, about, and contact",
+      "A fast, full-width gallery that looks great on phones",
+      "Contact or inquiry form that goes straight to your email",
+      "Your own domain connected (yourname.com)",
+      "Hosting, SSL, daily backups, and uptime monitoring",
+      "Room to grow into more pages or a print shop later",
+    ],
+    faqs: [
+      { q: "Is Ultra-Lite really $30 a month?", a: "Yes. Ultra-Lite is $30 a month with a one-time $500 setup and a 6-month term. That covers the build, hosting, security, backups, and support. Changes after launch are billed only when you ask for them, at $60 an hour." },
+      { q: "Can I sell prints or book shoots later?", a: "Yes. You can move up to a bigger plan any time, or add our eCommerce Storefront to sell prints online. Nothing has to be rebuilt." },
+      { q: "Do I need to be a business?", a: "No. Ultra-Lite is built for individuals: artists, photographers, designers, students, and anyone who wants a professional home for their work or resume." },
+      FAQ_TIME,
+    ],
+  },
+  {
     slug: "auto-detailing-websites-everett",
     niche: "Auto Detailers",
     nicheShort: "detailing",
@@ -415,7 +449,7 @@ ${nav}
       <section class="lp-section" aria-labelledby="problems-h">
         <div class="section-wrap">
           <p class="section-label">What we see</p>
-          <h2 id="problems-h">Where ${esc(p.nicheShort)} websites lose customers</h2>
+          <h2 id="problems-h">${esc(p.problemsHeading || `Where ${p.nicheShort} websites lose customers`)}</h2>
           <div class="lp-problems">
             ${p.problems
               .map(([h, t], i) => `<div class="lp-problem"><span class="lp-problem__num">${i + 1}</span><h3>${esc(h)}</h3><p>${esc(t)}</p></div>`)
@@ -473,7 +507,7 @@ function hubPage() {
   };
   return `${head({
     title: "Websites by Industry | Evergreen Digital, Snohomish County WA",
-    description: "Website design and monthly care plans for local businesses in Snohomish County: detailers, churches, salons, contractors, restaurants, and boutiques.",
+    description: "Website design and monthly care plans for local businesses in Snohomish County: detailers, churches, salons, contractors, restaurants, boutiques, plus portfolio sites for artists and photographers from $30/mo.",
     url,
     schema,
   })}
@@ -483,8 +517,8 @@ ${nav}
     <header class="lp-hero">
       <div class="section-wrap">
         <p class="hero__tag">Industries</p>
-        <h1 class="lp-hero__h1">Websites built for how your business actually works</h1>
-        <p class="lp-hero__intro">Every industry loses customers in different places. Pick yours to see what we focus on.</p>
+        <h1 class="lp-hero__h1">Websites built for how you actually work</h1>
+        <p class="lp-hero__intro">Every business, and every creative, loses visitors in different places. Pick yours to see what we focus on. Plans start at $30/mo.</p>
       </div>
     </header>
     <main>

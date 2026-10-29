@@ -8,6 +8,10 @@
      - the plan we'd recommend, with a Basic / Growth / Elite toggle showing
        price, setup fee, and what that tier gets a business like theirs
 
+   GROUPS: entries with group: "individual" (portfolios, artists, photographers)
+   show under "For individuals" and recommend Ultra-Lite. Everything else
+   shows under "For businesses".
+
    ADDING / UPDATING DEMOS (Karl)
    ------------------------------
    Edit the BUSINESSES list below. For each type:
@@ -25,12 +29,25 @@
    showcase_select, showcase_tier, showcase_demo_click.
 
    PRICES: keep TIERS in sync with the Packages section and the pricing
-   master sheet (Oct 2026: $30/$50/$150/$350, setup $500/$1,000/$1,500/$2,000).
+   master sheet (Oct 2026: Ultra-Lite $30 / Basic $50 / Growth $150 / Elite $350, setup $500/$1,000/$1,500/$2,000).
    ============================================================================= */
 
 "use strict";
 
 const TIERS = {
+  ultralite: {
+    name: "Ultra-Lite",
+    price: "$30",
+    setup: "$500 setup",
+    term: "6-month term",
+    pages: 3,
+    includes: [
+      "1 to 3 pages, built from our proven layouts",
+      "Mobile-friendly design + contact form",
+      "Hosting, SSL, daily backups, uptime monitoring",
+      "Changes billed per request ($60/hr)",
+    ],
+  },
   basic: {
     name: "Basic",
     price: "$50",
@@ -73,6 +90,35 @@ const TIERS = {
 };
 
 const BUSINESSES = [
+  /* ── For individuals (Ultra-Lite) ── */
+  {
+    key: "portfolio",
+    group: "individual",
+    label: "Personal Portfolio",
+    emoji: "💼",
+    recommended: "ultralite",
+    why: "A portfolio is the first thing a recruiter, client, or collaborator checks after your name. A fast, clean site at your own domain looks more serious than a social profile, and it stays yours.",
+    pages: ["Home", "Work", "Contact", "About", "Resume", "Blog"],
+    addon: "Extra edit time when you add new work",
+    demoUrl: "", // Optional: Tegan's own portfolio as a real example
+    image: "",
+    tierParam: false,
+    brand: { name: "Jordan Lee", tagline: "Designer & developer", bg: "#f5f5f2", accent: "#2a7a4b", cta: "See My Work", light: true },
+  },
+  {
+    key: "artist",
+    group: "individual",
+    label: "Artist & Photographer",
+    emoji: "📷",
+    recommended: "ultralite",
+    why: "Your work is the website. A fast gallery that gets out of the way, a short about, and an easy way to inquire or book are all most artists and photographers need to start.",
+    pages: ["Gallery", "About", "Contact", "Exhibitions", "Prints", "Blog"],
+    addon: "eCommerce Storefront when you're ready to sell prints",
+    demoUrl: "", // Dale W Reiger Gallery demo: add URL when ready to show
+    image: "",
+    tierParam: false,
+    brand: { name: "Lumen Studio", tagline: "Photography, Pacific Northwest", bg: "#141414", accent: "#e8e2d4", cta: "View the Gallery" },
+  },
   {
     key: "coffee-shop",
     label: "Coffee Shop",
@@ -166,19 +212,6 @@ const BUSINESSES = [
     brand: { name: "Casa Verde Cantina", tagline: "Family recipes since 1998", bg: "#2d3b1f", accent: "#e8b04a", cta: "View the Menu" },
   },
   {
-    key: "gallery",
-    label: "Artist & Gallery",
-    emoji: "🎨",
-    recommended: "basic",
-    why: "Your work is the website. A clean, fast gallery that gets out of the way, an artist statement, and an easy inquiry form are all most artists need to start.",
-    pages: ["Home", "Gallery", "About the Artist", "Exhibitions", "Contact"],
-    addon: "eCommerce Storefront to sell prints",
-    demoUrl: "", // Dale W Reiger Gallery demo: add URL when ready to show
-    image: "",
-    tierParam: false,
-    brand: { name: "Lumen Gallery", tagline: "Original works, Pacific Northwest", bg: "#f4f1ea", accent: "#1e1e1e", cta: "View the Collection", light: true },
-  },
-  {
     key: "game-store",
     label: "Game & Hobby Store",
     emoji: "🎲",
@@ -267,7 +300,7 @@ function plan(biz, tier) {
           .join("")}
       </div>
 
-      <p class="sc-plan__eyebrow">${recommended ? `Our pick for ${esc(biz.label.toLowerCase())}` : `${esc(t.name)} plan`}</p>
+      <p class="sc-plan__eyebrow">${recommended ? `Our pick for ${biz.group === "individual" ? "a " : ""}${esc(biz.label.toLowerCase())}` : `${esc(t.name)} plan`}</p>
       <div class="sc-plan__price"><span>${esc(t.price)}</span>/mo</div>
       <p class="sc-plan__terms">+ ${esc(t.setup)} · ${esc(t.term)}</p>
 
@@ -282,7 +315,7 @@ function plan(biz, tier) {
       <p class="sc-plan__addon"><strong>Popular add-on:</strong> ${esc(biz.addon)}</p>
 
       <button class="btn-primary sc-plan__cta" data-modal-trigger aria-haspopup="dialog">
-        Get a Site Like This →
+        ${biz.group === "individual" ? "Get My Site →" : "Get a Site Like This →"}
       </button>
     </div>`;
 }
@@ -296,10 +329,19 @@ export function initShowcase() {
   const panel = root.querySelector(".sc-panel");
   if (!chips || !panel) return;
 
-  chips.innerHTML = BUSINESSES.map(
-    (b) => `<button type="button" class="sc-chip" role="tab" id="sc-tab-${b.key}" aria-selected="false"
-      aria-controls="sc-panel" data-biz="${b.key}"><span aria-hidden="true">${b.emoji}</span> ${esc(b.label)}</button>`
-  ).join("");
+  const chip = (b) => `<button type="button" class="sc-chip ${b.group === "individual" ? "sc-chip--individual" : ""}" role="tab" id="sc-tab-${b.key}" aria-selected="false"
+      aria-controls="sc-panel" data-biz="${b.key}"><span aria-hidden="true">${b.emoji}</span> ${esc(b.label)}</button>`;
+  const businesses = BUSINESSES.filter((b) => b.group !== "individual");
+  const individuals = BUSINESSES.filter((b) => b.group === "individual");
+  chips.innerHTML = `
+    <div class="sc-chips__group" role="presentation">
+      <span class="sc-chips__label" role="presentation">For businesses</span>
+      ${businesses.map(chip).join("")}
+    </div>
+    <div class="sc-chips__group sc-chips__group--individual" role="presentation">
+      <span class="sc-chips__label" role="presentation">For individuals <em>from $30/mo</em></span>
+      ${individuals.map(chip).join("")}
+    </div>`;
 
   const state = { biz: null, tier: null };
 
@@ -313,7 +355,7 @@ export function initShowcase() {
   };
 
   const select = (key, { tier, silent } = {}) => {
-    const biz = BUSINESSES.find((b) => b.key === key) || BUSINESSES[0];
+    const biz = BUSINESSES.find((b) => b.key === key) || BUSINESSES.find((b) => b.group !== "individual");
     state.biz = biz.key;
     state.tier = tier && TIERS[tier] ? tier : biz.recommended;
     chips.querySelectorAll(".sc-chip").forEach((c) => {
@@ -356,7 +398,7 @@ export function initShowcase() {
 
   // Deep link: /#showcase?biz=auto-detailing&tier=elite
   const params = new URLSearchParams((location.hash.split("?")[1] || ""));
-  select(params.get("biz") || BUSINESSES[0].key, { tier: params.get("tier"), silent: true });
+  select(params.get("biz") || businesses[0].key, { tier: params.get("tier"), silent: true });
   if (location.hash.startsWith("#showcase?")) {
     requestAnimationFrame(() => root.scrollIntoView({ block: "start" }));
   }

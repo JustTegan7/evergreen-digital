@@ -6,15 +6,29 @@
    runAudit(url) fetches one homepage plus a few supporting files and returns
    a scored checklist. The checks were approved in Oct 2026:
 
-     First impression   mobile speed, mobile layout, CTA near the top,
-                        click-to-call phone
-     Trust              HTTPS, reviews/testimonials, current copyright year
-     Findability        title tag, meta description, one H1, not blocked
-                        from Google, local business schema
+     First impression   mobile speed (Google's test, or our own quick check
+                        when Google is unavailable), mobile layout and zoom,
+                        link preview when shared, CTA near the top,
+                        click-to-call phone, a way to reach you without calling
+     Trust              HTTPS, everything loads securely, reviews,
+                        current copyright year, site icon, privacy policy,
+                        business email on its own domain
+     Findability        title tag, meta description, one H1, one consistent
+                        address (www, canonical, sitemap), content
+                        readable without JavaScript, not blocked from
+                        Google, local business (or product) schema
      Local presence     Google Business Profile with reviews,
-                        name/address/phone visible and consistent
-     Behind the scenes  broken links, image alt text, analytics, sitemap
+                        name/address/phone visible and consistent,
+                        business hours listed
+     Behind the scenes  broken links, image alt text, analytics, sitemap,
+                        domain renewal date (RDAP), security certificate
+                        expiry, email protection (SPF + DMARC)
      Freshness          when the site was last meaningfully updated
+
+   Online products (software, apps, online-only shops) are detected from their
+   schema or from app-style wording with no phone or address. For those the
+   local checks (tap-to-call, Business Profile, NAP) are "not scored" instead
+   of failing, and the schema check accepts product/organization schema.
 
    Optional environment variables (Vercel > Settings > Environment Variables):
      PAGESPEED_API_KEY       Google PageSpeed Insights key. Works without one,
@@ -25,6 +39,8 @@
    Copy shown to visitors avoids em dashes to match the rest of the site.
    ============================================================================= */
 
+import dns from "node:dns/promises";
+import tls from "node:tls";
 import { safeFetch, tryFetch, normaliseUrl, UserError } from "./safe-fetch.js";
 import {
   findTags,
@@ -61,8 +77,21 @@ const check = (id, category, label, weight, status, detail, fix = "") => ({
   fix,
 });
 
+const net_isIp = (h) => /^[\d.]+$|:/.test(h);
 const hostKey = (h) => h.toLowerCase().replace(/^www\./, "");
 const digits = (s) => String(s || "").replace(/\D/g, "").replace(/^1(?=\d{10}$)/, "");
+// Signs the homepage is for an online product (software, app, online-only shop)
+// rather than a local business. Counted as distinct cues, see siteProfile().
+const APP_CUES = [
+  /\blog ?in\b|\bsign ?in\b/i,
+  /\bsign ?up\b|\bcreate (an |your )?account\b/i,
+  /\bfree trial\b|\bstart (for )?free\b/i,
+  /\bwait ?list\b|\bearly access\b/i,
+  /\b(download|get) (the|our) app\b|\bapp store\b|\bgoogle play\b/i,
+  /\bper (user|seat)\b|\bSaaS\b|\bintegrations?\b|\bdashboard\b/i,
+];
+const ONLINE_TYPES = /^(SoftwareApplication|WebApplication|MobileApplication|VideoGame|OnlineBusiness|OnlineStore)$/;
+
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const fmtMonth = (d) => `${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
 
@@ -80,22 +109,41 @@ async function mapLimit(items, limit, fn) {
 }
 
 const PHONE_RE = /(?:\+?1[\s.-]?)?\(?\b[2-9]\d{2}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b/;
+// Case-sensitive on purpose: real street names are capitalized ("123 Main St",
+// "11419 19th Ave SE"). Case-insensitive matching flagged ordinary sentences
+// like "1 day late. Tap a circle" as an address.
 const STREET_RE =
-  /\b\d{1,6}\s+(?:[NSEW]\.?\s+|North\s+|South\s+|East\s+|West\s+)?(?:[A-Za-z0-9.'-]+\s){0,4}(?:St|Street|Ave|Avenue|Rd|Road|Blvd|Boulevard|Dr|Drive|Ln|Lane|Way|Hwy|Highway|Pl|Place|Ct|Court|Pkwy|Parkway|Cir|Circle|Ter|Terrace|Loop|Sq)\b\.?/i;
+  /\b\d{1,6}\s+(?:[NSEW]\.?\s+|North\s+|South\s+|East\s+|West\s+)?(?:(?:[A-Z][A-Za-z.'-]*|\d+(?:st|nd|rd|th)?)\s){1,4}(?:St|Street|Ave|Avenue|Rd|Road|Blvd|Boulevard|Dr|Drive|Ln|Lane|Way|Hwy|Highway|Pl|Place|Ct|Court|Pkwy|Parkway|Cir|Circle|Ter|Terrace|Loop|Sq)\b\.?/;
 const CTA_RE =
   /\b(call|book|schedule|appointment|reserve|contact|get (a |your )?(free )?(quote|estimate|started)|request|order|shop|visit|donate|give|join|sign up|free estimate|get in touch|menu)\b/i;
-const REVIEW_RE = /\b(testimonials?|reviews?|what (our )?(customers|clients|people) (say|are saying)|rated \d|5[- ]star|★★★)/i;
+// Review words only count in a heading, or as a phrase that only shows up next to
+// real reviews. A bare "reviews" anywhere in body copy ("reviewed texts are on
+// the roadmap") was passing pages that show no reviews at all.
+const REVIEW_HEADING_RE = /\b(testimonials?|reviews?|what (our )?(customers|clients|people|guests|members) (say|are saying)|kind words|happy (customers|clients))\b/i;
+const REVIEW_PHRASE_RE = /\b(what (our )?(customers|clients|people|guests|members) (say|are saying)|rated \d(\.\d)? (out of 5|stars?)|\d(\.\d)? stars? on google|5[- ]star (reviews?|rating)|\d+\+? (google |5[- ]star )?reviews)\b|★★★/i;
 
 /* ── External services ────────────────────────────────────────────────────── */
 
 async function pageSpeed(url) {
   const params = new URLSearchParams({ url, strategy: "mobile", category: "performance" });
   if (process.env.PAGESPEED_API_KEY) params.set("key", process.env.PAGESPEED_API_KEY);
+  const deadline = Date.now() + 45000;
   try {
-    const res = await fetch(`https://www.googleapis.com/pagespeedonline/v5/runPagespeed?${params}`, {
-      signal: AbortSignal.timeout(45000),
-    });
-    if (!res.ok) return null;
+    let res;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      res = await fetch(`https://www.googleapis.com/pagespeedonline/v5/runPagespeed?${params}`, {
+        signal: AbortSignal.timeout(Math.max(1000, deadline - Date.now())),
+      });
+      // Google's test sometimes fails with a 500 on the first try; one retry is
+      // worth it if there's time left. 4xx (quota, bad key) won't fix itself.
+      if (res.status < 500 || deadline - Date.now() < 15000) break;
+    }
+    if (!res.ok) {
+      // 429 almost always means PAGESPEED_API_KEY is missing and the shared
+      // anonymous quota is used up. Logged so it shows in Vercel's function logs.
+      console.warn(`[audit] PageSpeed returned ${res.status}${process.env.PAGESPEED_API_KEY ? "" : " (no PAGESPEED_API_KEY set)"}`);
+      return null;
+    }
     const data = await res.json();
     const lh = data.lighthouseResult;
     if (!lh?.categories?.performance) return null;
@@ -106,7 +154,8 @@ async function pageSpeed(url) {
       lcpMs: audits["largest-contentful-paint"]?.numericValue || null,
       viewportOk: audits.viewport ? audits.viewport.score === 1 : null,
     };
-  } catch {
+  } catch (err) {
+    console.warn(`[audit] PageSpeed failed: ${err?.name || err}`);
     return null;
   }
 }
@@ -141,6 +190,144 @@ async function findBusinessProfile(name, siteHost, city) {
     return { checked: false };
   }
 }
+
+/**
+ * Our own quick speed check, used when Google's test is unavailable. Measures
+ * how fast the server answered and how heavy the page is, from sizes the
+ * server reports for a sample of images, scripts and stylesheets.
+ */
+async function quickWeight(body, html, baseUrl) {
+  const pick = (tags, attr) =>
+    tags
+      .map((t) => t.attrs[attr])
+      .filter((v) => v && !/^data:/i.test(v))
+      .map((v) => {
+        try {
+          return new URL(v, baseUrl);
+        } catch {
+          return null;
+        }
+      })
+      .filter((u) => u && /^https?:$/.test(u.protocol));
+  const imgs = pick(findTags(stripNonContent(body), "img"), "src").slice(0, 10);
+  const scripts = pick(findTags(html, "script"), "src").slice(0, 8);
+  const styles = pick(findTags(html, "link").filter((l) => /stylesheet/i.test(l.attrs.rel || "")), "href").slice(0, 4);
+  const size = async (u) => {
+    const res = await tryFetch(u, { method: "HEAD", timeoutMs: 5000, readBody: false });
+    const n = Number(res?.headers?.get("content-length"));
+    return res?.ok && n > 0 ? n : 0;
+  };
+  const [imgSizes, codeSizes] = await Promise.all([mapLimit(imgs, 6, size), mapLimit([...scripts, ...styles], 6, size)]);
+  return {
+    imgBytes: imgSizes.reduce((a, b) => a + b, 0),
+    biggestImg: Math.max(0, ...imgSizes),
+    codeBytes: codeSizes.reduce((a, b) => a + b, 0),
+    scriptCount: findTags(html, "script").filter((t) => t.attrs.src).length,
+  };
+}
+
+/* ── Domain, certificate and email lookups ───────────────────────────────── */
+
+// Second-level labels that sit under a country code, e.g. joes.co.uk
+const SLD = /^(co|com|net|org|gov|edu|ac|ltd|plc|me|biz|info)$/;
+
+/** "www.shop.joes.co.uk" -> "joes.co.uk". Good enough for small-business sites. */
+export function registrableDomain(host) {
+  const parts = host.toLowerCase().replace(/\.$/, "").split(".");
+  if (parts.length <= 2) return parts.join(".");
+  const tld = parts[parts.length - 1];
+  const sld = parts[parts.length - 2];
+  const take = tld.length === 2 && SLD.test(sld) ? 3 : 2;
+  return parts.slice(-take).join(".");
+}
+
+const withTimeout = (promise, ms) =>
+  Promise.race([promise, new Promise((resolve) => setTimeout(() => resolve(null), ms))]);
+
+/** Expiration date from an RDAP domain record, or null. */
+export function rdapExpiry(json) {
+  const ev = (json?.events || []).find((e) => /expiration/i.test(e.eventAction || ""));
+  const d = ev ? new Date(ev.eventDate) : null;
+  return d && !Number.isNaN(d.getTime()) ? d : null;
+}
+
+async function domainExpiry(domain) {
+  // rdap.org redirects to the right registry (Verisign for .com, PIR for .org...)
+  try {
+    const res = await fetch(`https://rdap.org/domain/${encodeURIComponent(domain)}`, {
+      headers: { accept: "application/rdap+json, application/json" },
+      redirect: "follow",
+      signal: AbortSignal.timeout(6000),
+    });
+    if (!res.ok) return null;
+    return rdapExpiry(await res.json());
+  } catch {
+    return null;
+  }
+}
+
+/** When the site's security certificate expires, and who issued it. */
+export function certInfo(host, port = 443) {
+  return withTimeout(
+    new Promise((resolve) => {
+      const socket = tls.connect({ host, port, servername: net_isIp(host) ? undefined : host, rejectUnauthorized: false, timeout: 6000 }, () => {
+        const cert = socket.getPeerCertificate();
+        socket.end();
+        const validTo = cert?.valid_to ? new Date(cert.valid_to) : null;
+        resolve(validTo && !Number.isNaN(validTo.getTime()) ? { validTo, issuer: cert.issuer?.O || cert.issuer?.CN || "" } : null);
+      });
+      socket.on("error", () => resolve(null));
+      socket.on("timeout", () => {
+        socket.destroy();
+        resolve(null);
+      });
+    }),
+    7000
+  );
+}
+
+/** Parses SPF and DMARC TXT records into a simple summary. */
+export function emailAuthSummary(rootTxt, dmarcTxt) {
+  const flat = (rows) => (rows || []).map((r) => (Array.isArray(r) ? r.join("") : String(r)));
+  const spf = flat(rootTxt).find((t) => /^v=spf1\b/i.test(t.trim())) || null;
+  const dmarc = flat(dmarcTxt).find((t) => /^v=DMARC1\b/i.test(t.trim())) || null;
+  const policy = dmarc ? ((dmarc.match(/\bp\s*=\s*(none|quarantine|reject)/i) || [])[1] || "none").toLowerCase() : null;
+  return { spf, dmarc, policy };
+}
+
+async function emailAuth(domain) {
+  const txt = (name) => withTimeout(dns.resolveTxt(name).catch((e) => (e?.code === "ENODATA" || e?.code === "ENOTFOUND" ? [] : null)), 5000);
+  const [mx, root, dmarc] = await Promise.all([
+    withTimeout(dns.resolveMx(domain).catch((e) => (e?.code === "ENODATA" || e?.code === "ENOTFOUND" ? [] : null)), 5000),
+    txt(domain),
+    txt(`_dmarc.${domain}`),
+  ]);
+  if (mx === null || root === null || dmarc === null) return null; // lookup failed, don't guess
+  return { hasMx: mx.length > 0, ...emailAuthSummary(root, dmarc) };
+}
+
+const FREE_MAIL = /@(gmail|googlemail|yahoo|ymail|hotmail|outlook|live|msn|aol|icloud|me|mac|comcast|att|sbcglobal|verizon|frontier|charter|centurylink|proton|protonmail)\.[a-z.]+$/i;
+const EMAIL_RE = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi;
+const DAY_RE = /\b(mon(day)?|tue(s(day)?)?|wed(nesday)?|thu(r(s(day)?)?)?|fri(day)?|sat(urday)?|sun(day)?)\b/gi;
+const TIME_RE = /\b\d{1,2}(:\d{2})?\s*(am|pm|a\.m\.|p\.m\.)|\b([01]?\d|2[0-3]):[0-5]\d\b|\b(noon|midnight)\b/i;
+const BOOKING_RE =
+  /calendly\.com|acuityscheduling|squareup\.com\/appointments|square\.site|book\.squareup|vagaro|booksy|fresha|setmore|schedulicity|mindbodyonline|glossgenius|opentable|resy\.com|tock\.com|toasttab|doordash|ubereats|grubhub|jobber|housecallpro|servicetitan|getjobber|tidycal|youcanbook|simplybook|zocdoc|hsforms|jotform|typeform|formspree|tally\.so|wufoo|cognitoforms|google\.com\/forms|forms\.gle/i;
+
+/** True when the page lists opening hours, in text or schema. */
+export function hasBusinessHours(text, schema) {
+  if (schema.some((o) => o.openingHours || o.openingHoursSpecification)) return true;
+  if (/\b(open 24 hours|open 24\/7|24\/7|by appointment( only)?|hours of operation|business hours|opening hours|store hours|office hours|service times)\b/i.test(text)) return true;
+  // A day name with a time within a short distance, e.g. "Mon - Fri 9am - 5pm"
+  for (const m of text.matchAll(DAY_RE)) {
+    if (TIME_RE.test(text.slice(m.index, m.index + 60))) return true;
+  }
+  return false;
+}
+
+const daysUntil = (d, now) => Math.floor((d - now) / 86_400_000);
+const fmtDay = (d) => `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
+
+const kb = (n) => (n >= 1_000_000 ? `${(n / 1_000_000).toFixed(1)} MB` : `${Math.round(n / 1000)} KB`);
 
 /* ── Page signal extraction ───────────────────────────────────────────────── */
 
@@ -183,6 +370,29 @@ export async function runAudit(rawUrl) {
   const businessName = guessBusinessName(html, schema);
   const now = new Date();
   const year = now.getUTCFullYear();
+
+  // Contact details, needed early to tell local businesses from online products
+  const hasTel = /href\s*=\s*["']?tel:/i.test(body);
+  const phoneOnPage = (visibleText.match(PHONE_RE) || [null])[0];
+  const hasAddress = STREET_RE.test(visibleText) || schema.some((o) => o.address?.streetAddress);
+  const appCues = APP_CUES.filter((re) => re.test(visibleText)).length;
+  const onlineSchema = types.some((t) => ONLINE_TYPES.test(t));
+  // Conservative: a local business with no phone and no address should still be
+  // told about it, so the text-only path needs two separate app-style cues.
+  const isOnlineProduct = onlineSchema || (!hasTel && !phoneOnPage && !hasAddress && appCues >= 2);
+
+  // Pages built entirely in the browser (plain React/Vite) send Google an
+  // almost empty shell. Measured on the raw HTML, before any JavaScript runs.
+  const jsShell =
+    visibleText.length < 150 &&
+    /<div[^>]+id=["'](root|app|__next|__nuxt|svelte)["'][^>]*>\s*<\/div>/i.test(body) &&
+    /<script\b[^>]*\bsrc=/i.test(html);
+
+  // Domain, certificate and email lookups run alongside everything else
+  const siteDomain = net_isIp(finalUrl.hostname) ? null : registrableDomain(finalUrl.hostname);
+  const domainPromise = siteDomain ? domainExpiry(siteDomain) : Promise.resolve(null);
+  const certPromise = finalUrl.protocol === "https:" && !net_isIp(finalUrl.hostname) ? certInfo(finalUrl.hostname) : Promise.resolve(null);
+  const emailAuthPromise = siteDomain ? emailAuth(siteDomain).catch(() => null) : Promise.resolve(null);
 
   // Supporting fetches in parallel
   const httpUrl = new URL(finalUrl.href);
@@ -246,9 +456,45 @@ export async function runAudit(rawUrl) {
   });
 
   const city = schema.find((o) => o.address?.addressLocality)?.address?.addressLocality || null;
-  const gbpPromise = findBusinessProfile(businessName, finalUrl.hostname, city);
+  const gbpPromise = isOnlineProduct ? Promise.resolve({ checked: false }) : findBusinessProfile(businessName, finalUrl.hostname, city);
 
-  const [speed, linkResults, gbp] = await Promise.all([speedPromise, linkResultsPromise, gbpPromise]);
+  const weightPromise = quickWeight(body, html, finalUrl).catch(() => null);
+
+  // Does the other version of the domain (www vs no www) end up on the same site?
+  const altHost = finalUrl.hostname.startsWith("www.") ? finalUrl.hostname.slice(4) : "www." + finalUrl.hostname;
+  const altUrl = new URL(finalUrl.href);
+  altUrl.hostname = altHost;
+  altUrl.pathname = "/";
+  const altPromise = net_isIp(finalUrl.hostname) ? Promise.resolve(null) : tryFetch(altUrl, { timeoutMs: 6000, readBody: false });
+
+  const faviconPromise = findTags(html, "link").some((l) => /\bicon\b/i.test(l.attrs.rel || "") && l.attrs.href)
+    ? Promise.resolve(true)
+    : tryFetch(new URL("/favicon.ico", origin), { timeoutMs: 5000, readBody: false }).then((r) => !!r?.ok);
+
+  const ogImage = metaContent(html, "og:image");
+  const ogImagePromise = ogImage
+    ? (async () => {
+        try {
+          const r = await tryFetch(new URL(ogImage, finalUrl), { method: "HEAD", timeoutMs: 5000, readBody: false });
+          return !!r?.ok;
+        } catch {
+          return false;
+        }
+      })()
+    : Promise.resolve(false);
+
+  const [speed, linkResults, gbp, weight, altRes, hasFavicon, ogImageOk, domainExp, cert, mailAuth] = await Promise.all([
+    speedPromise,
+    linkResultsPromise,
+    gbpPromise,
+    weightPromise,
+    altPromise,
+    faviconPromise,
+    ogImagePromise,
+    domainPromise,
+    certPromise,
+    emailAuthPromise,
+  ]);
 
   const checks = [];
 
@@ -269,6 +515,31 @@ export async function runAudit(rawUrl) {
           : "Most visitors are on phones, and many leave if a page takes more than about 3 seconds. Compressing images, trimming plugins and scripts, and better hosting usually fix this."
       )
     );
+  } else if (weight) {
+    // Google's test was unavailable, so score our own lighter measurements.
+    const serverMs = page.ms;
+    const problems = [];
+    if (serverMs > 2500) problems.push(["fail", `your server took ${(serverMs / 1000).toFixed(1)} seconds just to deliver the page`]);
+    else if (serverMs > 1200) problems.push(["warn", `your server took ${(serverMs / 1000).toFixed(1)} seconds to deliver the page`]);
+    if (weight.imgBytes > 4_000_000) problems.push(["fail", `the images we sampled add up to ${kb(weight.imgBytes)}`]);
+    else if (weight.biggestImg > 800_000) problems.push(["warn", `one image alone is ${kb(weight.biggestImg)}`]);
+    else if (weight.imgBytes > 2_000_000) problems.push(["warn", `the images we sampled add up to ${kb(weight.imgBytes)}`]);
+    if (weight.scriptCount > 30) problems.push(["warn", `the page loads ${weight.scriptCount} separate scripts`]);
+    else if (weight.codeBytes > 1_500_000) problems.push(["warn", `the page's code files add up to ${kb(weight.codeBytes)}`]);
+    const status = problems.some((p) => p[0] === "fail") ? "fail" : problems.length ? "warn" : "pass";
+    checks.push(
+      check(
+        "speed",
+        "First impression",
+        "Mobile loading speed",
+        8,
+        status,
+        status === "pass"
+          ? `Your page loaded in ${serverMs < 1000 ? "under a second" : `${(serverMs / 1000).toFixed(1)} seconds`} and isn't weighed down by heavy images or code. (Quick check, Google's full test was unavailable.)`
+          : `In our quick check, ${problems.map((p) => p[1]).join(", and ")}. (Google's full test was unavailable.)`,
+        status === "pass" ? "" : "Most visitors are on phones, and many leave if a page takes more than about 3 seconds. Compressing images, trimming plugins and scripts, and better hosting usually fix this."
+      )
+    );
   } else {
     checks.push(
       check("speed", "First impression", "Mobile loading speed", 12, "skip", "Google's speed test didn't respond this time, so speed isn't counted in your score.", "We can run a full speed test for you on a free call.")
@@ -277,15 +548,43 @@ export async function runAudit(rawUrl) {
 
   const viewport = metaContent(html, "viewport") || "";
   const mobileOk = speed?.viewportOk ?? /width\s*=\s*device-width/i.test(viewport);
+  const zoomBlocked = /user-scalable\s*=\s*(no|0)|maximum-scale\s*=\s*1(\.0)?\b/i.test(viewport);
   checks.push(
     check(
       "mobile",
       "First impression",
       "Mobile-friendly layout",
       10,
-      mobileOk ? "pass" : "fail",
-      mobileOk ? "Your site is set up to resize for phones." : "Your site isn't set up to resize for phones, so visitors have to pinch and zoom.",
-      mobileOk ? "" : "A responsive layout (with a proper viewport setting) makes the site fit any screen. This is the single biggest fix for most older sites."
+      !mobileOk ? "fail" : zoomBlocked ? "warn" : "pass",
+      !mobileOk
+        ? "Your site isn't set up to resize for phones, so visitors have to pinch and zoom."
+        : zoomBlocked
+          ? "Your site resizes for phones, but it stops visitors from zooming in, which makes small text hard to read."
+          : "Your site is set up to resize for phones.",
+      !mobileOk
+        ? "A responsive layout (with a proper viewport setting) makes the site fit any screen. This is the single biggest fix for most older sites."
+        : zoomBlocked
+          ? "Remove \"user-scalable=no\" and \"maximum-scale=1\" from the viewport setting so people can zoom. It's also an accessibility requirement."
+          : ""
+    )
+  );
+
+  const ogTitle = metaContent(html, "og:title");
+  checks.push(
+    check(
+      "share-preview",
+      "First impression",
+      "Link preview when shared",
+      3,
+      ogTitle && ogImageOk ? "pass" : ogTitle || ogImage ? "warn" : "fail",
+      ogTitle && ogImageOk
+        ? "Your link shows a title and image when it's shared in texts or on social media."
+        : ogImage && !ogImageOk
+          ? "Your share image is set, but it didn't load, so shared links show up without a picture."
+          : ogTitle
+            ? "Shared links show a title but no image."
+            : "Your site has no preview set, so links shared in texts or on Facebook show up plain or with a random image.",
+      ogTitle && ogImageOk ? "" : "Add a share title and image (Open Graph tags). Links with a picture get noticeably more clicks when people share them."
     )
   );
 
@@ -307,9 +606,11 @@ export async function runAudit(rawUrl) {
     )
   );
 
-  const hasTel = /href\s*=\s*["']?tel:/i.test(body);
-  const phoneOnPage = (visibleText.match(PHONE_RE) || [null])[0];
-  checks.push(
+  if (isOnlineProduct && !hasTel && !phoneOnPage) {
+    checks.push(
+      check("click-to-call", "First impression", "Tap-to-call phone number", 7, "skip", "Your site looks like an online product, so a tap-to-call number isn't expected.", "")
+    );
+  } else checks.push(
     check(
       "click-to-call",
       "First impression",
@@ -322,6 +623,37 @@ export async function runAudit(rawUrl) {
           ? "Your phone number is on the page, but tapping it on a phone doesn't start a call."
           : "We couldn't find a phone number on your homepage.",
       hasTel ? "" : "Make your phone number a tap-to-call link. For local businesses it's often the most-used button on the whole site."
+    )
+  );
+
+  // A way to reach the business without calling (form, email, booking or ordering)
+  const forms = findElements(body, "form").filter((f) => /<(input|textarea|select)\b/i.test(f.inner) && !/type=["']?search/i.test(f.inner));
+  const hasMailto = /href\s*=\s*["']?mailto:/i.test(body);
+  const bookingLink = anchors.find((a) => BOOKING_RE.test(a.attrs.href || ""));
+  const hasBookingEmbed = BOOKING_RE.test(html);
+  // Online products are reached by signing up or joining a waitlist, not by phone
+  const appEntry = isOnlineProduct && anchors.some((a) => /\b(sign ?up|log ?in|get started|start free|free trial|join|wait ?list|request (a )?demo|contact)\b/i.test(textOf(a.inner)));
+  const contactWays = [
+    forms.length && "a form",
+    hasMailto && "an email link",
+    (bookingLink || hasBookingEmbed) && "online booking or ordering",
+    appEntry && "sign-up or contact links",
+  ].filter(Boolean);
+  checks.push(
+    check(
+      "contact",
+      "First impression",
+      "A way to reach you without calling",
+      5,
+      contactWays.length ? "pass" : "fail",
+      contactWays.length
+        ? isOnlineProduct
+          ? `Visitors can get started or reach you right from the homepage (${contactWays.join(" and ")}).`
+          : `Visitors who don't want to call can reach you through ${contactWays.join(" and ")}.`
+        : isOnlineProduct
+          ? "We couldn't find a way for visitors to sign up or get in touch from the homepage."
+          : "The only way to reach you from the homepage seems to be a phone call, and many people (especially younger customers) won't call.",
+      contactWays.length ? "" : "Add a short contact form, online booking, or at least a tap-to-email link so people can reach you on their own time, even after hours."
     )
   );
 
@@ -350,7 +682,10 @@ export async function runAudit(rawUrl) {
   );
 
   const hasReviewSchema = types.some((t) => /^(Review|AggregateRating)$/.test(t)) || schema.some((o) => o.aggregateRating || o.review);
-  const hasReviews = hasReviewSchema || REVIEW_RE.test(visibleText) || /elfsight|trustindex|birdeye|podium|yotpo|google-reviews/i.test(html);
+  const headingText = ["h1", "h2", "h3", "h4"].flatMap((t) => findElements(body, t)).map((h) => textOf(h.inner)).join(" | ");
+  const hasReviewWidget = /elfsight|trustindex|birdeye|podium\.com|yotpo|google-reviews|reviewsonmywebsite|embedsocial|trustpilot\.com\/|widget\.reviews/i.test(html);
+  const hasReviews =
+    hasReviewSchema || hasReviewWidget || REVIEW_HEADING_RE.test(headingText) || REVIEW_PHRASE_RE.test(visibleText) || findElements(body, "blockquote").some((b) => textOf(b.inner).length > 40);
   checks.push(
     check(
       "reviews",
@@ -386,6 +721,81 @@ export async function runAudit(rawUrl) {
   checks.push(
     check("copyright", "Trust", "Current copyright year", 4, copyStatus, copyDetail, copyStatus === "pass" ? "" : "A small fix, but an old year makes people wonder if the business is still open. Set it to update automatically.")
   );
+
+  checks.push(
+    check(
+      "favicon",
+      "Trust",
+      "Site icon in the browser tab",
+      2,
+      hasFavicon ? "pass" : "warn",
+      hasFavicon ? "Your site has its own icon in browser tabs and bookmarks." : "Your site has no icon, so browser tabs and bookmarks show a blank page symbol.",
+      hasFavicon ? "" : "Add a small version of your logo as the site icon (favicon). It's a quick fix that makes the site look finished."
+    )
+  );
+
+  if (isHttps) {
+    const insecure = [
+      ...findTags(body, "img").map((t) => t.attrs.src),
+      ...findTags(html, "script").map((t) => t.attrs.src),
+      ...findTags(html, "iframe").map((t) => t.attrs.src),
+      ...findTags(html, "link").filter((l) => /stylesheet/i.test(l.attrs.rel || "")).map((t) => t.attrs.href),
+    ].filter((u) => /^http:\/\//i.test(u || ""));
+    checks.push(
+      check(
+        "mixed-content",
+        "Trust",
+        "Everything loads securely",
+        4,
+        insecure.length ? "warn" : "pass",
+        insecure.length
+          ? `${insecure.length} image${insecure.length === 1 ? "" : "s"} or file${insecure.length === 1 ? "" : "s"} still load over insecure http://, which browsers may block or flag.`
+          : "Every image and file on your homepage loads over a secure connection.",
+        insecure.length ? "Switch those links from http:// to https://. Browsers block some insecure files, which can leave broken images or missing features." : ""
+      )
+    );
+  }
+
+  const collectsInfo = findElements(body, "form").some((f) => /type=["']?(email|tel)|<textarea|name=["']?(email|phone)/i.test(f.inner)) ||
+    /calendly|acuityscheduling|squareup\.com\/appointments|vagaro|booksy|fresha|setmore|formspree|hsforms|jotform|typeform/i.test(html);
+  const hasPrivacy = anchors.some((a) => /privacy/i.test(a.attrs.href || "") || /privacy/i.test(textOf(a.inner)));
+  if (collectsInfo || hasPrivacy) {
+    checks.push(
+      check(
+        "privacy",
+        "Trust",
+        "Privacy policy",
+        2,
+        hasPrivacy ? "pass" : "warn",
+        hasPrivacy ? "Your site links to a privacy policy." : "Your site collects names, emails, or phone numbers, but we didn't see a privacy policy link.",
+        hasPrivacy ? "" : "Add a short privacy policy page and link it in the footer. Anyone filling out a form expects one, and Google requires it for ads."
+      )
+    );
+  }
+
+  // Business email on its own domain vs a free Gmail/Yahoo address
+  const emails = [
+    ...[...body.matchAll(/href\s*=\s*["']?mailto:([^"'?\s>]+)/gi)].map((m) => decodeURIComponent(m[1])),
+    ...(visibleText.match(EMAIL_RE) || []),
+  ]
+    .map((e) => e.toLowerCase())
+    .filter((e) => !/\.(png|jpe?g|gif|webp|svg)$/.test(e) && !/example\.com|sentry|wixpress|domain\.com/.test(e));
+  if (emails.length) {
+    const freeOnes = [...new Set(emails.filter((e) => FREE_MAIL.test(e)))];
+    checks.push(
+      check(
+        "own-email",
+        "Trust",
+        "Business email on your own domain",
+        3,
+        freeOnes.length ? "warn" : "pass",
+        freeOnes.length
+          ? `Your site lists ${freeOnes[0]}. A free email address makes a business look smaller and less established than it is.`
+          : "Your site lists an email address on your own domain, which looks professional.",
+        freeOnes.length ? "Use an address like info@yourbusiness.com. It costs a few dollars a month and can forward to the inbox you already use." : ""
+      )
+    );
+  }
 
   /* ── Findability ── */
 
@@ -447,6 +857,63 @@ export async function runAudit(rawUrl) {
     )
   );
 
+  checks.push(
+    check(
+      "crawlable",
+      "Findability",
+      "Content Google can read",
+      8,
+      jsShell ? "warn" : "pass",
+      jsShell
+        ? "Your homepage arrives almost empty and builds itself with JavaScript. Google can usually still read it, but more slowly, and link previews and some search tools see a blank page."
+        : "Your homepage text is in the page itself, so Google can read it right away.",
+      jsShell ? "Pre-render or server-render the homepage (most frameworks have a setting for it) so the words and links are there before any JavaScript runs." : ""
+    )
+  );
+
+  const finalKey = finalUrl.hostname.toLowerCase();
+  const hostIssues = [];
+  if (altRes && altRes.ok) {
+    try {
+      if (new URL(altRes.url).hostname.toLowerCase() !== finalKey) hostIssues.push(`${altHost} shows a separate copy of the site instead of redirecting to ${finalKey}`);
+    } catch {}
+  }
+  const canonical = findTags(html, "link").find((l) => /\bcanonical\b/i.test(l.attrs.rel || ""))?.attrs.href;
+  if (canonical) {
+    try {
+      const c = new URL(canonical, finalUrl);
+      if (c.hostname.toLowerCase() !== finalKey) hostIssues.push(`your page tells Google its main address is ${c.hostname}, but visitors end up on ${finalKey}`);
+    } catch {}
+  }
+  if (sitemap) {
+    const locHosts = [...sitemap.text.matchAll(/<loc>\s*([^<\s]+)/gi)]
+      .map((m) => {
+        try {
+          return new URL(m[1]).hostname.toLowerCase();
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean);
+    const other = locHosts.find((h) => h !== finalKey);
+    if (other) hostIssues.push(`your sitemap lists pages on ${other}, but visitors end up on ${finalKey}`);
+  }
+  checks.push(
+    check(
+      "one-address",
+      "Findability",
+      "One consistent web address",
+      4,
+      hostIssues.length ? "warn" : "pass",
+      hostIssues.length
+        ? `Google sees mixed signals about your main address: ${hostIssues.join("; ")}.`
+        : "Your site uses one consistent address, so Google isn't splitting your ranking between versions.",
+      hostIssues.length
+        ? "Pick one version (with or without www), redirect the other to it, and use that exact version in your sitemap and canonical tag."
+        : ""
+    )
+  );
+
   const robotsMeta = (metaContent(html, "robots") || "") + " " + (page.headers.get("x-robots-tag") || "");
   let blocked = /noindex/i.test(robotsMeta);
   if (!blocked && robotsTxt) {
@@ -470,7 +937,22 @@ export async function runAudit(rawUrl) {
     /LocalBusiness|Store|Restaurant|CafeOrCoffeeShop|BarOrPub|Bakery|FoodEstablishment|AutomotiveBusiness|AutoRepair|AutoWash|AutoDealer|HealthAndBeautyBusiness|HairSalon|BeautySalon|DaySpa|NailSalon|HomeAndConstructionBusiness|Plumber|Electrician|HVACBusiness|RoofingContractor|GeneralContractor|HousePainter|Locksmith|MovingCompany|ProfessionalService|LegalService|Attorney|AccountingService|Dentist|MedicalBusiness|ExerciseGym|SportsActivityLocation|PlaceOfWorship|Church|LodgingBusiness|EntertainmentBusiness|ChildCare|AnimalShelter|FinancialService|RealEstateAgent|InsuranceAgency|TravelAgency|EmploymentAgency|DryCleaningOrLaundry|SelfStorage|TattooParlor|ArtGallery/;
   const hasLocalSchema = types.some((t) => LOCAL_TYPES.test(t));
   const hasOrgSchema = types.some((t) => /Organization|Corporation|NGO/.test(t));
-  checks.push(
+  if (isOnlineProduct) {
+    const hasProductSchema = onlineSchema || hasOrgSchema || types.some((t) => /^(Product|Service|WebSite)$/.test(t));
+    checks.push(
+      check(
+        "local-schema",
+        "Findability",
+        "Business info for Google",
+        5,
+        hasProductSchema ? "pass" : "warn",
+        hasProductSchema
+          ? "Your site includes behind-the-scenes info (schema) that tells Google what your product is."
+          : "Your site doesn't include behind-the-scenes info (schema) describing your product for Google.",
+        hasProductSchema ? "" : "Add Organization and SoftwareApplication (or Product) schema with your name, logo, and what you offer. It helps Google show a richer search listing."
+      )
+    );
+  } else checks.push(
     check(
       "local-schema",
       "Findability",
@@ -490,10 +972,13 @@ export async function runAudit(rawUrl) {
 
   const schemaPhone = schema.find((o) => o.telephone)?.telephone;
   const sitePhone = schemaPhone || (body.match(/href\s*=\s*["']?tel:([^"'\s>]+)/i) || [])[1] || phoneOnPage;
-  const hasAddress = STREET_RE.test(visibleText) || schema.some((o) => o.address?.streetAddress);
   const serviceArea = /\b(serving|service area|we serve|areas? we serve)\b/i.test(visibleText) || schema.some((o) => o.areaServed);
 
-  if (gbp.checked) {
+  if (isOnlineProduct) {
+    checks.push(
+      check("gbp", "Local presence", "Google Business Profile with reviews", 8, "skip", "Your site looks like an online product rather than a local business, so a Google Business Profile isn't scored.", "")
+    );
+  } else if (gbp.checked) {
     const p = gbp.place;
     const count = p?.userRatingCount || 0;
     checks.push(
@@ -523,7 +1008,10 @@ export async function runAudit(rawUrl) {
 
   let napStatus, napDetail, napFix = "";
   const gbpPhone = gbp.place?.nationalPhoneNumber;
-  if (gbpPhone && sitePhone && digits(gbpPhone) !== digits(sitePhone)) {
+  if (isOnlineProduct) {
+    napStatus = "skip";
+    napDetail = "Your site looks like an online product, so a street address and local phone aren't expected.";
+  } else if (gbpPhone && sitePhone && digits(gbpPhone) !== digits(sitePhone)) {
     napStatus = "fail";
     napDetail = `The phone number on your site doesn't match your Google Business Profile (${gbpPhone}).`;
     napFix = "Use the exact same business name, address, and phone everywhere. Mismatches confuse Google and cost you map rankings.";
@@ -540,6 +1028,23 @@ export async function runAudit(rawUrl) {
     napFix = "List your business name, phone, and address (or the cities you serve) on every page, usually in the footer. Keep it identical to your Google profile.";
   }
   checks.push(check("nap", "Local presence", "Name, address and phone listed consistently", 6, napStatus, napDetail, napFix));
+
+  if (isOnlineProduct) {
+    checks.push(check("hours", "Local presence", "Business hours listed", 4, "skip", "Your site looks like an online product, so business hours aren't expected.", ""));
+  } else {
+    const hoursOk = hasBusinessHours(visibleText, schema);
+    checks.push(
+      check(
+        "hours",
+        "Local presence",
+        "Business hours listed",
+        4,
+        hoursOk ? "pass" : "warn",
+        hoursOk ? "Your hours are on the homepage, so people know when they can reach you." : "We couldn't find your business hours on the homepage.",
+        hoursOk ? "" : "Show your hours (or \"by appointment\") on the homepage or in the footer. \"Are they open?\" is one of the top reasons people look up a local business."
+      )
+    );
+  }
 
   /* ── Behind the scenes ── */
 
@@ -585,7 +1090,14 @@ export async function runAudit(rawUrl) {
   );
 
   const analytics = [
-    [/googletagmanager\.com|google-analytics\.com|gtag\(|\bga\(/i, "Google Analytics"],
+    [/googletagmanager\.com\/gtag|google-analytics\.com|gtag\(|\bga\(|\bG-[A-Z0-9]{6,}\b/i, "Google Analytics"],
+    [/googletagmanager\.com\/gtm\.js|\bGTM-[A-Z0-9]{4,}\b/i, "Google Tag Manager"],
+    // Vercel serves its script from a random first-party path, so match the SDK tag too
+    [/@vercel\/analytics|\/_vercel\/insights|va\.vercel-scripts\.com/i, "Vercel Analytics"],
+    [/static\.cloudflareinsights\.com|cf-beacon/i, "Cloudflare Web Analytics"],
+    [/posthog/i, "PostHog"],
+    [/umami/i, "Umami"],
+    [/scripts\.simpleanalyticscdn\.com/i, "Simple Analytics"],
     [/plausible\.io/i, "Plausible"],
     [/usefathom\.com/i, "Fathom"],
     [/connect\.facebook\.net|fbq\(/i, "Meta Pixel"],
@@ -624,6 +1136,74 @@ export async function runAudit(rawUrl) {
     )
   );
 
+  if (domainExp) {
+    const left = daysUntil(domainExp, now);
+    checks.push(
+      check(
+        "domain-expiry",
+        "Behind the scenes",
+        "Domain name renewal",
+        6,
+        left < 0 ? "fail" : left <= 14 ? "fail" : left <= 45 ? "warn" : "pass",
+        left < 0
+          ? `Your domain name (${siteDomain}) shows as expired on ${fmtDay(domainExp)}.`
+          : left <= 45
+            ? `Your domain name (${siteDomain}) expires in ${left} day${left === 1 ? "" : "s"}, on ${fmtDay(domainExp)}.`
+            : `Your domain name (${siteDomain}) is registered until ${fmtDay(domainExp)}.`,
+        left <= 45
+          ? "Renew it now or confirm auto-renew is on with a current card. If a domain lapses, the website and any email on it stop working, and someone else can buy the name."
+          : ""
+      )
+    );
+  } else if (siteDomain) {
+    checks.push(check("domain-expiry", "Behind the scenes", "Domain name renewal", 6, "skip", "The domain registry didn't answer, so we couldn't check when your domain renews.", ""));
+  }
+
+  if (cert) {
+    const left = daysUntil(cert.validTo, now);
+    // Free automated certificates (Vercel, Netlify, most hosts) renew themselves
+    // in the last month, so only flag those when they're nearly out.
+    const autoRenews = /let's encrypt|google trust|zerossl|amazon/i.test(cert.issuer);
+    checks.push(
+      check(
+        "cert-expiry",
+        "Behind the scenes",
+        "Security certificate up to date",
+        5,
+        left < 0 ? "fail" : left <= (autoRenews ? 7 : 21) ? "warn" : "pass",
+        left < 0
+          ? `Your security certificate expired on ${fmtDay(cert.validTo)}, so browsers show visitors a full-page warning.`
+          : left <= (autoRenews ? 7 : 21)
+            ? `Your security certificate expires in ${left} day${left === 1 ? "" : "s"}${autoRenews ? " and should renew on its own, but it's cutting it close" : ""}.`
+            : `Your security certificate is valid until ${fmtDay(cert.validTo)}.`,
+        left <= (autoRenews ? 7 : 21) ? "Renew the certificate (or check that automatic renewal is working). When it lapses, browsers block visitors with a scary warning page." : ""
+      )
+    );
+  }
+
+  if (mailAuth && mailAuth.hasMx) {
+    const { spf, dmarc, policy } = mailAuth;
+    const status = !spf && !dmarc ? "fail" : !spf || !dmarc || policy === "none" ? "warn" : "pass";
+    const missing = [!spf && "SPF", !dmarc && "DMARC"].filter(Boolean);
+    checks.push(
+      check(
+        "email-auth",
+        "Behind the scenes",
+        "Email protected from spoofing",
+        4,
+        status,
+        status === "pass"
+          ? "Your business email has SPF and DMARC set up, so your emails are less likely to land in spam and harder for scammers to fake."
+          : missing.length
+            ? `Your email domain is missing ${missing.join(" and ")}, so your emails are more likely to land in spam and scammers can send emails that look like they're from you.`
+            : "Your email domain has SPF and DMARC, but DMARC is only set to monitor, so fake emails using your name still get delivered.",
+        status === "pass"
+          ? ""
+          : "These are a few free settings in your domain's DNS. Google and Yahoo now expect them from businesses, and they take about 15 minutes to set up."
+      )
+    );
+  }
+
   /* ── Freshness ── */
 
   const dates = [];
@@ -650,7 +1230,12 @@ export async function runAudit(rawUrl) {
     freshest = new Date(Date.UTC(latestCopyright, 11, 31));
     freshnessSource = "copyright year";
   }
-  if (freshest) {
+  if (freshest && freshnessSource === "copyright year" && latestCopyright >= year) {
+    // A current footer year is a weak signal: it is often printed automatically.
+    checks.push(
+      check("freshness", "Freshness", "Recently updated", 6, "skip", `We couldn't find an update date. Your footer shows ${latestCopyright}, but that doesn't prove the content itself is recent.`, "")
+    );
+  } else if (freshest) {
     const months = (now - freshest) / (1000 * 60 * 60 * 24 * 30.4);
     const when = freshnessSource === "copyright year" ? String(latestCopyright) : fmtMonth(freshest);
     checks.push(
@@ -666,6 +1251,19 @@ export async function runAudit(rawUrl) {
     );
   } else {
     checks.push(check("freshness", "Freshness", "Recently updated", 6, "skip", "We couldn't tell when your site was last updated.", ""));
+  }
+
+  // On a JavaScript-only page we can't see the visible content, so content checks
+  // would report things as missing that visitors can actually see. Don't score them.
+  if (jsShell) {
+    const CONTENT_CHECKS = new Set(["cta", "click-to-call", "contact", "reviews", "copyright", "h1", "nap", "hours", "alt-text", "broken-links"]);
+    for (const c of checks) {
+      if (CONTENT_CHECKS.has(c.id)) {
+        c.status = "skip";
+        c.detail = "Your page builds itself with JavaScript, so we couldn't check this automatically. We'll look at it with you on a free call.";
+        c.fix = "";
+      }
+    }
   }
 
   /* ── Score ── */

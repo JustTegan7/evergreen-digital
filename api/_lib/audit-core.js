@@ -251,19 +251,48 @@ export function rdapExpiry(json) {
   return d && !Number.isNaN(d.getTime()) ? d : null;
 }
 
-async function domainExpiry(domain) {
-  // rdap.org redirects to the right registry (Verisign for .com, PIR for .org...)
+// IANA's list of which registry answers RDAP for each ending (.com, .org...).
+// Cached for the life of the function instance.
+let rdapBootstrap = null;
+async function rdapBaseFor(tld) {
   try {
-    const res = await fetch(`https://rdap.org/domain/${encodeURIComponent(domain)}`, {
-      headers: { accept: "application/rdap+json, application/json" },
-      redirect: "follow",
-      signal: AbortSignal.timeout(6000),
-    });
-    if (!res.ok) return null;
-    return rdapExpiry(await res.json());
+    if (!rdapBootstrap) {
+      const res = await fetch("https://data.iana.org/rdap/dns.json", { signal: AbortSignal.timeout(5000) });
+      if (res.ok) rdapBootstrap = await res.json();
+    }
+    const svc = (rdapBootstrap?.services || []).find(([tlds]) => tlds.includes(tld));
+    const base = svc?.[1]?.find((u) => u.startsWith("https://")) || svc?.[1]?.[0];
+    return base ? (base.endsWith("/") ? base : base + "/") : null;
   } catch {
     return null;
   }
+}
+
+async function rdapLookup(url) {
+  try {
+    const res = await fetch(url, {
+      headers: { accept: "application/rdap+json, application/json" },
+      redirect: "follow",
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) {
+      console.warn(`[audit] RDAP ${res.status} from ${new URL(url).hostname}`);
+      return null;
+    }
+    return rdapExpiry(await res.json());
+  } catch (err) {
+    console.warn(`[audit] RDAP failed from ${new URL(url).hostname}: ${err?.name || err}`);
+    return null;
+  }
+}
+
+async function domainExpiry(domain) {
+  // Ask the registry directly (Verisign for .com, PIR for .org...). rdap.org is
+  // only a fallback: it rate-limits shared cloud servers like Vercel's.
+  const tld = domain.split(".").pop();
+  const base = await rdapBaseFor(tld);
+  const enc = encodeURIComponent(domain);
+  return (base && (await rdapLookup(`${base}domain/${enc}`))) || (await rdapLookup(`https://rdap.org/domain/${enc}`));
 }
 
 /** When the site's security certificate expires, and who issued it. */
@@ -1106,7 +1135,39 @@ export async function runAudit(rawUrl) {
     [/matomo|piwik/i, "Matomo"],
     [/squarespace|wix\.com|shopify|weebly|godaddy/i, null], // built-in analytics, unknown
   ];
-  const found = analytics.filter(([re, name]) => name && re.test(html)).map(([, name]) => name);
+  let found = analytics.filter(([re, name]) => name && re.test(html)).map(([, name]) => name);
+  if (!found.length) {
+    // Frameworks like Next.js often add the tracking script after the page loads,
+    // so it isn't in the HTML. Look inside the site's own script files too.
+    const ownScripts = findTags(html, "script")
+      .map((t) => t.attrs.src)
+      .filter(Boolean)
+      .map((src) => {
+        try {
+          return new URL(src, finalUrl);
+        } catch {
+          return null;
+        }
+      })
+      .filter((u) => u && hostKey(u.hostname) === hostKey(finalUrl.hostname))
+      .slice(0, 12);
+    const bundles = await mapLimit(ownScripts, 6, (u) => tryFetch(u, { timeoutMs: 5000, maxBytes: 600_000 }));
+    const code = bundles.map((b) => (b?.ok ? b.text : "")).join("\n");
+    // Stricter patterns here: short ones like "ga(" match ordinary minified code.
+    const BUNDLE_SIGNS = [
+      [/googletagmanager\.com\/gtag|google-analytics\.com\/(g\/collect|analytics\.js)/i, "Google Analytics"],
+      [/googletagmanager\.com\/gtm\.js/i, "Google Tag Manager"],
+      [/@vercel\/analytics|\/_vercel\/insights|va\.vercel-scripts\.com/i, "Vercel Analytics"],
+      [/static\.cloudflareinsights\.com/i, "Cloudflare Web Analytics"],
+      [/posthog\.com|posthog-js/i, "PostHog"],
+      [/plausible\.io\/js/i, "Plausible"],
+      [/cdn\.usefathom\.com/i, "Fathom"],
+      [/clarity\.ms\/tag/i, "Microsoft Clarity"],
+      [/static\.hotjar\.com/i, "Hotjar"],
+      [/connect\.facebook\.net\/[a-z_]+\/fbevents/i, "Meta Pixel"],
+    ];
+    found = BUNDLE_SIGNS.filter(([re]) => re.test(code)).map(([, name]) => name);
+  }
   const builder = analytics[analytics.length - 1][0].test(html);
   checks.push(
     check(

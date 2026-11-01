@@ -33,6 +33,7 @@ const LOADING_STEPS = [
   "Checking security and trust signals",
   "Checking what Google sees",
   "Testing your links",
+  "Checking your domain and email setup",
   "Adding up your score",
 ];
 

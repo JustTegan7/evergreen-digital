@@ -9,16 +9,20 @@
      First impression   mobile speed (Google's test, or our own quick check
                         when Google is unavailable), mobile layout and zoom,
                         link preview when shared, CTA near the top,
-                        click-to-call phone
+                        click-to-call phone, a way to reach you without calling
      Trust              HTTPS, everything loads securely, reviews,
-                        current copyright year, site icon, privacy policy
+                        current copyright year, site icon, privacy policy,
+                        business email on its own domain
      Findability        title tag, meta description, one H1, one consistent
                         address (www, canonical, sitemap), content
                         readable without JavaScript, not blocked from
                         Google, local business (or product) schema
      Local presence     Google Business Profile with reviews,
-                        name/address/phone visible and consistent
-     Behind the scenes  broken links, image alt text, analytics, sitemap
+                        name/address/phone visible and consistent,
+                        business hours listed
+     Behind the scenes  broken links, image alt text, analytics, sitemap,
+                        domain renewal date (RDAP), security certificate
+                        expiry, email protection (SPF + DMARC)
      Freshness          when the site was last meaningfully updated
 
    Online products (software, apps, online-only shops) are detected from their
@@ -35,6 +39,8 @@
    Copy shown to visitors avoids em dashes to match the rest of the site.
    ============================================================================= */
 
+import dns from "node:dns/promises";
+import tls from "node:tls";
 import { safeFetch, tryFetch, normaliseUrl, UserError } from "./safe-fetch.js";
 import {
   findTags,
@@ -220,6 +226,107 @@ async function quickWeight(body, html, baseUrl) {
   };
 }
 
+/* ── Domain, certificate and email lookups ───────────────────────────────── */
+
+// Second-level labels that sit under a country code, e.g. joes.co.uk
+const SLD = /^(co|com|net|org|gov|edu|ac|ltd|plc|me|biz|info)$/;
+
+/** "www.shop.joes.co.uk" -> "joes.co.uk". Good enough for small-business sites. */
+export function registrableDomain(host) {
+  const parts = host.toLowerCase().replace(/\.$/, "").split(".");
+  if (parts.length <= 2) return parts.join(".");
+  const tld = parts[parts.length - 1];
+  const sld = parts[parts.length - 2];
+  const take = tld.length === 2 && SLD.test(sld) ? 3 : 2;
+  return parts.slice(-take).join(".");
+}
+
+const withTimeout = (promise, ms) =>
+  Promise.race([promise, new Promise((resolve) => setTimeout(() => resolve(null), ms))]);
+
+/** Expiration date from an RDAP domain record, or null. */
+export function rdapExpiry(json) {
+  const ev = (json?.events || []).find((e) => /expiration/i.test(e.eventAction || ""));
+  const d = ev ? new Date(ev.eventDate) : null;
+  return d && !Number.isNaN(d.getTime()) ? d : null;
+}
+
+async function domainExpiry(domain) {
+  // rdap.org redirects to the right registry (Verisign for .com, PIR for .org...)
+  try {
+    const res = await fetch(`https://rdap.org/domain/${encodeURIComponent(domain)}`, {
+      headers: { accept: "application/rdap+json, application/json" },
+      redirect: "follow",
+      signal: AbortSignal.timeout(6000),
+    });
+    if (!res.ok) return null;
+    return rdapExpiry(await res.json());
+  } catch {
+    return null;
+  }
+}
+
+/** When the site's security certificate expires, and who issued it. */
+export function certInfo(host, port = 443) {
+  return withTimeout(
+    new Promise((resolve) => {
+      const socket = tls.connect({ host, port, servername: net_isIp(host) ? undefined : host, rejectUnauthorized: false, timeout: 6000 }, () => {
+        const cert = socket.getPeerCertificate();
+        socket.end();
+        const validTo = cert?.valid_to ? new Date(cert.valid_to) : null;
+        resolve(validTo && !Number.isNaN(validTo.getTime()) ? { validTo, issuer: cert.issuer?.O || cert.issuer?.CN || "" } : null);
+      });
+      socket.on("error", () => resolve(null));
+      socket.on("timeout", () => {
+        socket.destroy();
+        resolve(null);
+      });
+    }),
+    7000
+  );
+}
+
+/** Parses SPF and DMARC TXT records into a simple summary. */
+export function emailAuthSummary(rootTxt, dmarcTxt) {
+  const flat = (rows) => (rows || []).map((r) => (Array.isArray(r) ? r.join("") : String(r)));
+  const spf = flat(rootTxt).find((t) => /^v=spf1\b/i.test(t.trim())) || null;
+  const dmarc = flat(dmarcTxt).find((t) => /^v=DMARC1\b/i.test(t.trim())) || null;
+  const policy = dmarc ? ((dmarc.match(/\bp\s*=\s*(none|quarantine|reject)/i) || [])[1] || "none").toLowerCase() : null;
+  return { spf, dmarc, policy };
+}
+
+async function emailAuth(domain) {
+  const txt = (name) => withTimeout(dns.resolveTxt(name).catch((e) => (e?.code === "ENODATA" || e?.code === "ENOTFOUND" ? [] : null)), 5000);
+  const [mx, root, dmarc] = await Promise.all([
+    withTimeout(dns.resolveMx(domain).catch((e) => (e?.code === "ENODATA" || e?.code === "ENOTFOUND" ? [] : null)), 5000),
+    txt(domain),
+    txt(`_dmarc.${domain}`),
+  ]);
+  if (mx === null || root === null || dmarc === null) return null; // lookup failed, don't guess
+  return { hasMx: mx.length > 0, ...emailAuthSummary(root, dmarc) };
+}
+
+const FREE_MAIL = /@(gmail|googlemail|yahoo|ymail|hotmail|outlook|live|msn|aol|icloud|me|mac|comcast|att|sbcglobal|verizon|frontier|charter|centurylink|proton|protonmail)\.[a-z.]+$/i;
+const EMAIL_RE = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi;
+const DAY_RE = /\b(mon(day)?|tue(s(day)?)?|wed(nesday)?|thu(r(s(day)?)?)?|fri(day)?|sat(urday)?|sun(day)?)\b/gi;
+const TIME_RE = /\b\d{1,2}(:\d{2})?\s*(am|pm|a\.m\.|p\.m\.)|\b([01]?\d|2[0-3]):[0-5]\d\b|\b(noon|midnight)\b/i;
+const BOOKING_RE =
+  /calendly\.com|acuityscheduling|squareup\.com\/appointments|square\.site|book\.squareup|vagaro|booksy|fresha|setmore|schedulicity|mindbodyonline|glossgenius|opentable|resy\.com|tock\.com|toasttab|doordash|ubereats|grubhub|jobber|housecallpro|servicetitan|getjobber|tidycal|youcanbook|simplybook|zocdoc|hsforms|jotform|typeform|formspree|tally\.so|wufoo|cognitoforms|google\.com\/forms|forms\.gle/i;
+
+/** True when the page lists opening hours, in text or schema. */
+export function hasBusinessHours(text, schema) {
+  if (schema.some((o) => o.openingHours || o.openingHoursSpecification)) return true;
+  if (/\b(open 24 hours|open 24\/7|24\/7|by appointment( only)?|hours of operation|business hours|opening hours|store hours|office hours|service times)\b/i.test(text)) return true;
+  // A day name with a time within a short distance, e.g. "Mon - Fri 9am - 5pm"
+  for (const m of text.matchAll(DAY_RE)) {
+    if (TIME_RE.test(text.slice(m.index, m.index + 60))) return true;
+  }
+  return false;
+}
+
+const daysUntil = (d, now) => Math.floor((d - now) / 86_400_000);
+const fmtDay = (d) => `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
+
 const kb = (n) => (n >= 1_000_000 ? `${(n / 1_000_000).toFixed(1)} MB` : `${Math.round(n / 1000)} KB`);
 
 /* ── Page signal extraction ───────────────────────────────────────────────── */
@@ -280,6 +387,12 @@ export async function runAudit(rawUrl) {
     visibleText.length < 150 &&
     /<div[^>]+id=["'](root|app|__next|__nuxt|svelte)["'][^>]*>\s*<\/div>/i.test(body) &&
     /<script\b[^>]*\bsrc=/i.test(html);
+
+  // Domain, certificate and email lookups run alongside everything else
+  const siteDomain = net_isIp(finalUrl.hostname) ? null : registrableDomain(finalUrl.hostname);
+  const domainPromise = siteDomain ? domainExpiry(siteDomain) : Promise.resolve(null);
+  const certPromise = finalUrl.protocol === "https:" && !net_isIp(finalUrl.hostname) ? certInfo(finalUrl.hostname) : Promise.resolve(null);
+  const emailAuthPromise = siteDomain ? emailAuth(siteDomain).catch(() => null) : Promise.resolve(null);
 
   // Supporting fetches in parallel
   const httpUrl = new URL(finalUrl.href);
@@ -370,7 +483,7 @@ export async function runAudit(rawUrl) {
       })()
     : Promise.resolve(false);
 
-  const [speed, linkResults, gbp, weight, altRes, hasFavicon, ogImageOk] = await Promise.all([
+  const [speed, linkResults, gbp, weight, altRes, hasFavicon, ogImageOk, domainExp, cert, mailAuth] = await Promise.all([
     speedPromise,
     linkResultsPromise,
     gbpPromise,
@@ -378,6 +491,9 @@ export async function runAudit(rawUrl) {
     altPromise,
     faviconPromise,
     ogImagePromise,
+    domainPromise,
+    certPromise,
+    emailAuthPromise,
   ]);
 
   const checks = [];
@@ -510,6 +626,37 @@ export async function runAudit(rawUrl) {
     )
   );
 
+  // A way to reach the business without calling (form, email, booking or ordering)
+  const forms = findElements(body, "form").filter((f) => /<(input|textarea|select)\b/i.test(f.inner) && !/type=["']?search/i.test(f.inner));
+  const hasMailto = /href\s*=\s*["']?mailto:/i.test(body);
+  const bookingLink = anchors.find((a) => BOOKING_RE.test(a.attrs.href || ""));
+  const hasBookingEmbed = BOOKING_RE.test(html);
+  // Online products are reached by signing up or joining a waitlist, not by phone
+  const appEntry = isOnlineProduct && anchors.some((a) => /\b(sign ?up|log ?in|get started|start free|free trial|join|wait ?list|request (a )?demo|contact)\b/i.test(textOf(a.inner)));
+  const contactWays = [
+    forms.length && "a form",
+    hasMailto && "an email link",
+    (bookingLink || hasBookingEmbed) && "online booking or ordering",
+    appEntry && "sign-up or contact links",
+  ].filter(Boolean);
+  checks.push(
+    check(
+      "contact",
+      "First impression",
+      "A way to reach you without calling",
+      5,
+      contactWays.length ? "pass" : "fail",
+      contactWays.length
+        ? isOnlineProduct
+          ? `Visitors can get started or reach you right from the homepage (${contactWays.join(" and ")}).`
+          : `Visitors who don't want to call can reach you through ${contactWays.join(" and ")}.`
+        : isOnlineProduct
+          ? "We couldn't find a way for visitors to sign up or get in touch from the homepage."
+          : "The only way to reach you from the homepage seems to be a phone call, and many people (especially younger customers) won't call.",
+      contactWays.length ? "" : "Add a short contact form, online booking, or at least a tap-to-email link so people can reach you on their own time, even after hours."
+    )
+  );
+
   /* ── Trust ── */
 
   const isHttps = finalUrl.protocol === "https:";
@@ -622,6 +769,30 @@ export async function runAudit(rawUrl) {
         hasPrivacy ? "pass" : "warn",
         hasPrivacy ? "Your site links to a privacy policy." : "Your site collects names, emails, or phone numbers, but we didn't see a privacy policy link.",
         hasPrivacy ? "" : "Add a short privacy policy page and link it in the footer. Anyone filling out a form expects one, and Google requires it for ads."
+      )
+    );
+  }
+
+  // Business email on its own domain vs a free Gmail/Yahoo address
+  const emails = [
+    ...[...body.matchAll(/href\s*=\s*["']?mailto:([^"'?\s>]+)/gi)].map((m) => decodeURIComponent(m[1])),
+    ...(visibleText.match(EMAIL_RE) || []),
+  ]
+    .map((e) => e.toLowerCase())
+    .filter((e) => !/\.(png|jpe?g|gif|webp|svg)$/.test(e) && !/example\.com|sentry|wixpress|domain\.com/.test(e));
+  if (emails.length) {
+    const freeOnes = [...new Set(emails.filter((e) => FREE_MAIL.test(e)))];
+    checks.push(
+      check(
+        "own-email",
+        "Trust",
+        "Business email on your own domain",
+        3,
+        freeOnes.length ? "warn" : "pass",
+        freeOnes.length
+          ? `Your site lists ${freeOnes[0]}. A free email address makes a business look smaller and less established than it is.`
+          : "Your site lists an email address on your own domain, which looks professional.",
+        freeOnes.length ? "Use an address like info@yourbusiness.com. It costs a few dollars a month and can forward to the inbox you already use." : ""
       )
     );
   }
@@ -858,6 +1029,23 @@ export async function runAudit(rawUrl) {
   }
   checks.push(check("nap", "Local presence", "Name, address and phone listed consistently", 6, napStatus, napDetail, napFix));
 
+  if (isOnlineProduct) {
+    checks.push(check("hours", "Local presence", "Business hours listed", 4, "skip", "Your site looks like an online product, so business hours aren't expected.", ""));
+  } else {
+    const hoursOk = hasBusinessHours(visibleText, schema);
+    checks.push(
+      check(
+        "hours",
+        "Local presence",
+        "Business hours listed",
+        4,
+        hoursOk ? "pass" : "warn",
+        hoursOk ? "Your hours are on the homepage, so people know when they can reach you." : "We couldn't find your business hours on the homepage.",
+        hoursOk ? "" : "Show your hours (or \"by appointment\") on the homepage or in the footer. \"Are they open?\" is one of the top reasons people look up a local business."
+      )
+    );
+  }
+
   /* ── Behind the scenes ── */
 
   const broken = linkResults.filter((l) => l.status === 404 || l.status === 410 || l.status >= 500 || l.status === 0);
@@ -948,6 +1136,74 @@ export async function runAudit(rawUrl) {
     )
   );
 
+  if (domainExp) {
+    const left = daysUntil(domainExp, now);
+    checks.push(
+      check(
+        "domain-expiry",
+        "Behind the scenes",
+        "Domain name renewal",
+        6,
+        left < 0 ? "fail" : left <= 14 ? "fail" : left <= 45 ? "warn" : "pass",
+        left < 0
+          ? `Your domain name (${siteDomain}) shows as expired on ${fmtDay(domainExp)}.`
+          : left <= 45
+            ? `Your domain name (${siteDomain}) expires in ${left} day${left === 1 ? "" : "s"}, on ${fmtDay(domainExp)}.`
+            : `Your domain name (${siteDomain}) is registered until ${fmtDay(domainExp)}.`,
+        left <= 45
+          ? "Renew it now or confirm auto-renew is on with a current card. If a domain lapses, the website and any email on it stop working, and someone else can buy the name."
+          : ""
+      )
+    );
+  } else if (siteDomain) {
+    checks.push(check("domain-expiry", "Behind the scenes", "Domain name renewal", 6, "skip", "The domain registry didn't answer, so we couldn't check when your domain renews.", ""));
+  }
+
+  if (cert) {
+    const left = daysUntil(cert.validTo, now);
+    // Free automated certificates (Vercel, Netlify, most hosts) renew themselves
+    // in the last month, so only flag those when they're nearly out.
+    const autoRenews = /let's encrypt|google trust|zerossl|amazon/i.test(cert.issuer);
+    checks.push(
+      check(
+        "cert-expiry",
+        "Behind the scenes",
+        "Security certificate up to date",
+        5,
+        left < 0 ? "fail" : left <= (autoRenews ? 7 : 21) ? "warn" : "pass",
+        left < 0
+          ? `Your security certificate expired on ${fmtDay(cert.validTo)}, so browsers show visitors a full-page warning.`
+          : left <= (autoRenews ? 7 : 21)
+            ? `Your security certificate expires in ${left} day${left === 1 ? "" : "s"}${autoRenews ? " and should renew on its own, but it's cutting it close" : ""}.`
+            : `Your security certificate is valid until ${fmtDay(cert.validTo)}.`,
+        left <= (autoRenews ? 7 : 21) ? "Renew the certificate (or check that automatic renewal is working). When it lapses, browsers block visitors with a scary warning page." : ""
+      )
+    );
+  }
+
+  if (mailAuth && mailAuth.hasMx) {
+    const { spf, dmarc, policy } = mailAuth;
+    const status = !spf && !dmarc ? "fail" : !spf || !dmarc || policy === "none" ? "warn" : "pass";
+    const missing = [!spf && "SPF", !dmarc && "DMARC"].filter(Boolean);
+    checks.push(
+      check(
+        "email-auth",
+        "Behind the scenes",
+        "Email protected from spoofing",
+        4,
+        status,
+        status === "pass"
+          ? "Your business email has SPF and DMARC set up, so your emails are less likely to land in spam and harder for scammers to fake."
+          : missing.length
+            ? `Your email domain is missing ${missing.join(" and ")}, so your emails are more likely to land in spam and scammers can send emails that look like they're from you.`
+            : "Your email domain has SPF and DMARC, but DMARC is only set to monitor, so fake emails using your name still get delivered.",
+        status === "pass"
+          ? ""
+          : "These are a few free settings in your domain's DNS. Google and Yahoo now expect them from businesses, and they take about 15 minutes to set up."
+      )
+    );
+  }
+
   /* ── Freshness ── */
 
   const dates = [];
@@ -1000,7 +1256,7 @@ export async function runAudit(rawUrl) {
   // On a JavaScript-only page we can't see the visible content, so content checks
   // would report things as missing that visitors can actually see. Don't score them.
   if (jsShell) {
-    const CONTENT_CHECKS = new Set(["cta", "click-to-call", "reviews", "copyright", "h1", "nap", "alt-text", "broken-links"]);
+    const CONTENT_CHECKS = new Set(["cta", "click-to-call", "contact", "reviews", "copyright", "h1", "nap", "hours", "alt-text", "broken-links"]);
     for (const c of checks) {
       if (CONTENT_CHECKS.has(c.id)) {
         c.status = "skip";

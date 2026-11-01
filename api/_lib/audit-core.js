@@ -658,7 +658,14 @@ export async function runAudit(rawUrl) {
   // A way to reach the business without calling (form, email, booking or ordering)
   const forms = findElements(body, "form").filter((f) => /<(input|textarea|select)\b/i.test(f.inner) && !/type=["']?search/i.test(f.inner));
   const hasMailto = /href\s*=\s*["']?mailto:/i.test(body);
-  const bookingLink = anchors.find((a) => BOOKING_RE.test(a.attrs.href || ""));
+  // Booking tools by name, or any button/link that clearly leads to booking,
+  // ordering, a quote, or a contact page ("Book Now" -> /book-online/).
+  const bookingLink = anchors.find(
+    (a) =>
+      BOOKING_RE.test(a.attrs.href || "") ||
+      /\b(book|appointments?|schedule|reserve|reservations?|order (online|now|ahead|pickup)|get a (free )?(quote|estimate)|request (a )?(quote|estimate|appointment|consult)|contact us|message us|send (us )?a message)\b/i.test(textOf(a.inner)) ||
+      /\/(book|booking|book-online|appointments?|schedule|reserv|order|contact|quote|estimate)\b/i.test(a.attrs.href || "")
+  );
   const hasBookingEmbed = BOOKING_RE.test(html);
   // Online products are reached by signing up or joining a waitlist, not by phone
   const appEntry = isOnlineProduct && anchors.some((a) => /\b(sign ?up|log ?in|get started|start free|free trial|join|wait ?list|request (a )?demo|contact)\b/i.test(textOf(a.inner)));

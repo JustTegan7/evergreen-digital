@@ -31,6 +31,11 @@ import crypto from "node:crypto";
 let warned = false;
 function key() {
   let secret = process.env.AUDIT_SECRET;
+  if (!secret && (process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production")) {
+    // Fail closed: without a real secret anyone could forge report tokens and
+    // make /api/unlock send emails. Set AUDIT_SECRET in Vercel to fix.
+    throw new Error("AUDIT_SECRET is not set in production.");
+  }
   if (!secret) {
     if (!warned) {
       console.warn("[audit] AUDIT_SECRET is not set; using an insecure development key.");
@@ -78,7 +83,8 @@ export function rateLimited(ip, limit, windowMs) {
 }
 
 export function clientIp(req) {
-  return String(req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "unknown").split(",")[0].trim();
+  // Vercel sets x-real-ip itself, so visitors can't spoof it to dodge the limit.
+  return String(req.headers["x-real-ip"] || req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "unknown").split(",")[0].trim();
 }
 
 /* ── Request / response helpers (Vercel Node runtime) ─────────────────────── */
@@ -121,7 +127,9 @@ export function sameOriginOk(req) {
   try {
     const host = new URL(origin).host;
     const allowed = [req.headers.host, "www.evergreendigitalco.com", "evergreendigitalco.com"];
-    return allowed.includes(host) || host.endsWith(".vercel.app") || host.startsWith("localhost") || host.startsWith("127.0.0.1");
+    // Only this project's own Vercel preview URLs, not every site on vercel.app.
+    const preview = /^evergreen-digital[a-z0-9-]*\.vercel\.app$/.test(host);
+    return allowed.includes(host) || preview || host.startsWith("localhost:") || host === "localhost" || host.startsWith("127.0.0.1");
   } catch {
     return false;
   }

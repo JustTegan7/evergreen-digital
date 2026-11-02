@@ -1,0 +1,6 @@
+# Kept in the repo but not published on the live site
+docs/
+scripts/
+.github/
+README.md
+.env.example

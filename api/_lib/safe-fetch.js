@@ -41,13 +41,38 @@ function isPrivateIPv4(ip) {
   );
 }
 
+/** Expands an IPv6 address to 8 groups of 16-bit numbers. */
+function ipv6Groups(ip) {
+  let v = ip.toLowerCase().split("%")[0];
+  // Trailing dotted IPv4 (::ffff:1.2.3.4) -> two hex groups
+  const dotted = v.match(/(\d+\.\d+\.\d+\.\d+)$/);
+  if (dotted) {
+    const p = dotted[1].split(".").map(Number);
+    v = v.slice(0, -dotted[1].length) + ((p[0] << 8) | p[1]).toString(16) + ":" + ((p[2] << 8) | p[3]).toString(16);
+  }
+  const [head, tail] = v.includes("::") ? v.split("::") : [v, null];
+  const h = head ? head.split(":") : [];
+  const t = tail ? tail.split(":") : [];
+  const fill = tail === null ? [] : Array(8 - h.length - t.length).fill("0");
+  return [...h, ...fill, ...t].map((x) => parseInt(x || "0", 16));
+}
+
+const v4From = (hi, lo) => `${hi >> 8}.${hi & 255}.${lo >> 8}.${lo & 255}`;
+
 function isPrivateIPv6(ip) {
-  const v = ip.toLowerCase();
-  if (v === "::" || v === "::1") return true;
-  if (v.startsWith("fc") || v.startsWith("fd")) return true; // unique local
-  if (v.startsWith("fe8") || v.startsWith("fe9") || v.startsWith("fea") || v.startsWith("feb")) return true;
-  const mapped = v.match(/::ffff:(\d+\.\d+\.\d+\.\d+)$/);
-  if (mapped) return isPrivateIPv4(mapped[1]);
+  const g = ipv6Groups(ip);
+  if (g.length !== 8 || g.some((n) => Number.isNaN(n))) return true;
+  const [a, b] = g;
+  if (g.every((n) => n === 0)) return true; // ::
+  if (g.slice(0, 7).every((n) => n === 0) && g[7] === 1) return true; // ::1
+  if ((a & 0xfe00) === 0xfc00) return true; // fc00::/7 unique local
+  if ((a & 0xffc0) === 0xfe80) return true; // fe80::/10 link-local
+  if ((a & 0xff00) === 0xff00) return true; // multicast
+  if (a === 0x2001 && b === 0x0db8) return true; // documentation
+  // Addresses that carry an IPv4 address inside: check that address too.
+  if (g.slice(0, 5).every((n) => n === 0) && (g[5] === 0xffff || g[5] === 0)) return isPrivateIPv4(v4From(g[6], g[7])); // ::ffff:a.b.c.d, ::a.b.c.d
+  if (a === 0x64 && b === 0xff9b) return isPrivateIPv4(v4From(g[6], g[7])); // NAT64
+  if (a === 0x2002) return isPrivateIPv4(v4From(g[1], g[2])); // 6to4
   return false;
 }
 
@@ -133,6 +158,12 @@ export async function safeFetch(
     if (!["http:", "https:"].includes(url.protocol)) {
       throw new UserError("That site redirected somewhere we can't follow.");
     }
+    if (!ALLOW_PRIVATE && url.port && !["80", "443"].includes(url.port)) {
+      // Checked on every hop, not just the first, so a redirect can't send us
+      // to an internal service on another port.
+      throw new UserError("That site redirected somewhere we can't follow.");
+    }
+    if (url.username || url.password) throw new UserError("That site redirected somewhere we can't follow.");
     await assertPublicHost(url.hostname);
 
     const remaining = deadline - Date.now();

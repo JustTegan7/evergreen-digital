@@ -68,8 +68,9 @@ const TIERS = {
     price: "$150",
     setup: "$1,500 setup",
     term: "Month-to-month",
-    pages: 10,
+    pages: 20,
     includes: [
+      "Up to 20 pages",
       "Local SEO management",
       "Google Business Profile management + review requests",
       "1 hr of edits + monthly performance report",
@@ -81,8 +82,9 @@ const TIERS = {
     price: "$350",
     setup: "$2,000 setup",
     term: "Month-to-month",
-    pages: 20,
+    pages: 40,
     includes: [
+      "Up to 40 pages",
       "Email marketing (1 campaign/mo)",
       "Reputation + competitor monitoring",
       "2 hrs of edits + monthly check-in",

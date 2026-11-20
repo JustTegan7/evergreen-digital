@@ -366,70 +366,44 @@
        js/story.js sets --p (0 to 1) from scroll position. The slider is the
        keyboard and reduced-motion control for the same effect.
        ===================================================================== -->
-    <section class="story" id="story" aria-label="Before and after">
+    <section class="story" id="story" aria-label="A real sample website">
       <div class="section-wrap story__head">
-        <p class="section-label reveal">The Difference</p>
-        <h2 class="reveal">Most small business sites<br />quietly lose customers.</h2>
+        <p class="section-label reveal">A Real Sample Site</p>
+        <h2 class="reveal">This is what yours<br />would look like.</h2>
         <p class="section-sub reveal">
-          Keep scrolling and watch one get fixed. Same business, same
-          services. Nothing changes except how easy it is to choose them.
+          Keep scrolling and watch a full site we built roll by, top to
+          bottom. Yours would carry your name, your photos, and your prices.
         </p>
       </div>
 
-      <div class="ba" data-ba style="--p: 1">
+      <div class="ba" data-ba style="--p: 0">
         <div class="ba__sticky">
           <div class="ba__frame">
             <div class="mockup-bar">
               <div class="mockup-bar__dot mockup-bar__dot--red"></div>
               <div class="mockup-bar__dot mockup-bar__dot--yellow"></div>
               <div class="mockup-bar__dot mockup-bar__dot--green"></div>
-              <div class="mockup-bar__url">harborplumbing.com</div>
+              <div class="mockup-bar__url">summitplumbingheating.com</div>
             </div>
             <div class="ba__stage">
-              <div class="ba__layer old" role="img" aria-label="An outdated website with tiny text, a visitor counter and no clear way to call">
-                <div class="old__banner">★ Welcome to Harbor Plumbing &amp; Heating ★ Est. 1998 ★</div>
-                <div class="old__nav">Home | About Us | Services | Links | Guestbook | Contact</div>
-                <div class="old__body">
-                  <div class="old__img">[ photo1.jpg ]</div>
-                  <div>
-                    <h4>Welcome to our website!!</h4>
-                    <p>We are a plumbing company and have been in business a long time. We do many things. Please call for a quote during business hours.</p>
-                    <p class="old__warn">Page last updated 2014. Best viewed in Internet Explorer.</p>
-                  </div>
-                </div>
-                <div class="old__foot">Visitors: 004521 &nbsp;|&nbsp; Under construction</div>
-              </div>
+              <iframe class="ba__iframe" src="/demos/trades/" title="Sample plumbing and heating website" tabindex="-1"
+                sandbox="allow-scripts allow-same-origin" data-ba-frame></iframe>
 
-              <div class="ba__layer new" role="img" aria-label="The same business with a clean modern website, a call button and reviews">
-                <div class="new__nav"><b>Harbor Plumbing</b><span>Services</span><span>Reviews</span><span>Quote</span><i>Call now</i></div>
-                <div class="new__hero">
-                  <h4>Same-day plumbing, done right the first time.</h4>
-                  <p>Licensed, insured, and upfront pricing before we start.</p>
-                  <div class="new__btns"><i>Call now</i><i class="ghost">Free quote</i></div>
-                </div>
-                <div class="new__cards"><div>Leaks &amp; repairs</div><div>Water heaters</div><div>Heating</div></div>
-                <div class="new__proof">★★★★★ 4.9 from 260 Google reviews</div>
-              </div>
-
-              <div class="ba__edge" aria-hidden="true"></div>
-
-              <ul class="ba__chips" aria-label="What changed">
-                <li class="ba__chip" data-at="0.18">⚡ Loads in under 2 seconds</li>
-                <li class="ba__chip" data-at="0.36">📱 Works on every phone</li>
-                <li class="ba__chip" data-at="0.54">📞 One tap to call</li>
-                <li class="ba__chip" data-at="0.72">⭐ Reviews front and center</li>
-                <li class="ba__chip" data-at="0.9">🔎 Easier to find on Google</li>
+              <ul class="ba__chips" aria-label="What this site does">
+                <li class="ba__chip" data-at="0.15">⚡ Loads in under 2 seconds</li>
+                <li class="ba__chip" data-at="0.35">📱 Works on every phone</li>
+                <li class="ba__chip" data-at="0.55">📞 One tap to call</li>
+                <li class="ba__chip" data-at="0.75">⭐ Reviews front and center</li>
+                <li class="ba__chip" data-at="0.92">🔎 Easier to find on Google</li>
               </ul>
             </div>
           </div>
 
           <div class="ba__caption">
-            <span class="ba__state" aria-live="polite">After</span>
-            <label class="ba__slider-wrap">
-              <span class="sr-only">Drag to compare before and after</span>
-              <input class="ba__slider" type="range" min="0" max="100" value="100" />
-            </label>
-            <a class="ba__next" href="#how">See how we do it ↓</a>
+            <span class="ba__state" aria-live="off">Scroll</span>
+            <div class="ba__bar" aria-hidden="true"><i></i></div>
+            <a class="ba__next" href="/demos/trades/" target="_blank" rel="noopener">Open it full screen ↗</a>
+            <a class="ba__next" href="#showcase">Pick your business ↓</a>
           </div>
         </div>
       </div>
@@ -559,18 +533,29 @@
        Chips + panel are rendered by js/showcase.js (edit BUSINESSES there to
        add demo links). Deep link: /#showcase?biz=auto-detailing
        ===================================================================== -->
-    <section class="showcase" id="showcase" aria-label="Demo sites by business type">
+    <section class="showcase" id="showcase" aria-label="Choose your business, see a sample site, and price your plan">
       <div class="section-wrap">
         <p class="section-label reveal">See It For Your Business</p>
-        <h2 class="reveal">Don't know where to start?<br />Choose your business.</h2>
+        <h2 class="reveal">Not sure where to start?<br />Choose your business.</h2>
         <p class="section-sub reveal">
-          Pick what you do and see the kind of site we'd build, the pages it
-          would have, and the plan we'd recommend. Flip between plans to
-          compare.
+          Pick what you do. See a sample site, the pages it would have, and the plan we'd recommend. Then build your exact price right below.
         </p>
 
         <div class="sc-chips reveal" role="tablist" aria-label="Business type"></div>
         <div class="sc-panel" id="sc-panel" role="tabpanel" aria-live="polite"></div>
+
+        <!-- Plan builder: js/planbuilder.js renders the controls and summary -->
+        <div class="builder reveal" id="builder" aria-label="Plan builder">
+          <div class="builder__head">
+            <p class="section-label">Build your plan</p>
+            <h3>See your price before you talk to anyone.</h3>
+            <p class="builder__sub">Pick a plan, tick what you need, and watch the total update. Estimates match our standard pricing. Your agreement confirms the final numbers.</p>
+          </div>
+          <div class="builder__grid">
+            <div class="builder__controls" data-builder-controls></div>
+            <aside class="builder__summary" data-builder-summary aria-live="polite"></aside>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -764,23 +749,11 @@
           bank transfer (ACH) and take 2% off.
         </p>
 
-        <!-- Plan builder: js/planbuilder.js renders the controls and summary -->
-        <div class="builder reveal" id="builder" aria-label="Plan builder">
-          <div class="builder__head">
-            <p class="section-label">Build your plan</p>
-            <h3>See your price before you talk to anyone.</h3>
-            <p class="builder__sub">Pick a plan, tick what you need, and watch the total update. Estimates match our standard pricing. Your agreement confirms the final numbers.</p>
-          </div>
-          <div class="builder__grid">
-            <div class="builder__controls" data-builder-controls></div>
-            <aside class="builder__summary" data-builder-summary aria-live="polite"></aside>
-          </div>
-        </div>
       </div>
     </section>
 
     <!-- =====================================================================
-       Add-Ons + Industry Recommender
+       Add-Ons
        ===================================================================== -->
     <section class="addons" id="addons" aria-label="Add-on services">
       <div class="section-wrap">
@@ -791,89 +764,6 @@
           grow, or skip them entirely. Nothing here is required, and no add-on
           has a minimum term.
         </p>
-
-        <!-- Industry recommender -->
-        <div class="industry reveal" id="industry">
-          <p class="industry__prompt">
-            Not sure where to start? Pick your industry:
-          </p>
-
-          <div
-            class="industry__tabs"
-            role="tablist"
-            aria-label="Recommended package by industry"
-          >
-            <button
-              class="industry__tab is-active"
-              role="tab"
-              id="tab-home-services"
-              aria-selected="true"
-              aria-controls="industry-panel"
-              data-industry="home-services"
-            >
-              🔧 Home Services
-            </button>
-            <button
-              class="industry__tab"
-              role="tab"
-              id="tab-salons"
-              aria-selected="false"
-              aria-controls="industry-panel"
-              data-industry="salons"
-            >
-              💇 Salons &amp; Spas
-            </button>
-            <button
-              class="industry__tab"
-              role="tab"
-              id="tab-retail"
-              aria-selected="false"
-              aria-controls="industry-panel"
-              data-industry="retail"
-            >
-              🛍️ Retail &amp; eCommerce
-            </button>
-            <button
-              class="industry__tab"
-              role="tab"
-              id="tab-professional"
-              aria-selected="false"
-              aria-controls="industry-panel"
-              data-industry="professional"
-            >
-              💼 Professional Services
-            </button>
-            <button
-              class="industry__tab"
-              role="tab"
-              id="tab-gyms"
-              aria-selected="false"
-              aria-controls="industry-panel"
-              data-industry="gyms"
-            >
-              🏋️ Gyms &amp; Fitness
-            </button>
-            <button
-              class="industry__tab"
-              role="tab"
-              id="tab-nonprofits"
-              aria-selected="false"
-              aria-controls="industry-panel"
-              data-industry="nonprofits"
-            >
-              ⛪ Churches &amp; Nonprofits
-            </button>
-          </div>
-
-          <!-- Populated by js/industry.js -->
-          <div
-            class="industry__panel"
-            id="industry-panel"
-            role="tabpanel"
-            aria-labelledby="tab-home-services"
-            aria-live="polite"
-          ></div>
-        </div>
 
         <!-- Add-on catalog -->
         <div class="addons__grid">

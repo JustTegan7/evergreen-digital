@@ -313,6 +313,7 @@ function plan(biz, tier) {
   const recommended = tier === biz.recommended;
   return `
     <div class="sc-plan">
+      <div class="sc-plan__main">
       <div class="sc-toggle" role="radiogroup" aria-label="Choose a plan">
         ${Object.entries(TIERS)
           .map(
@@ -327,7 +328,9 @@ function plan(biz, tier) {
       <p class="sc-plan__terms">+ ${esc(t.setup)} · ${esc(t.term)}</p>
 
       <ul class="sc-plan__list">${t.includes.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>
+      </div>
 
+      <div class="sc-plan__side">
       <p class="sc-plan__pages-label">Pages we'd build for you</p>
       <ul class="sc-plan__pages">
         ${biz.pages.map((p, i) => `<li class="${i < t.pages ? "" : "is-off"}">${esc(p)}</li>`).join("")}
@@ -339,6 +342,7 @@ function plan(biz, tier) {
       <button class="btn-primary sc-plan__cta" data-modal-trigger aria-haspopup="dialog">
         ${biz.group === "individual" ? "Get My Site →" : "Get a Site Like This →"}
       </button>
+      </div>
     </div>`;
 }
 

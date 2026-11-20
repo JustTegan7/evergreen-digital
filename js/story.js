@@ -1,5 +1,5 @@
 /**
- * story.js, scroll-driven before/after, section progress dots, sticky CTA
+ * story.js, scroll-through of a real sample site, section progress dots, sticky CTA
  * Evergreen Digital · evergreendigitalco.com
  *
  * Before/after: sets the CSS variable --p (0 = old site, 1 = new site) from
@@ -16,46 +16,67 @@ const reduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)")
 function initBeforeAfter() {
   const root = document.querySelector("[data-ba]");
   if (!root) return;
-  const slider = root.querySelector(".ba__slider");
-  const state = root.querySelector(".ba__state");
+  const frame = root.querySelector("[data-ba-frame]");
+  const bar = root.querySelector(".ba__bar i");
   const chips = [...root.querySelectorAll(".ba__chip")];
   const still = reduceMotion();
+
+  // Reduced motion: let the visitor scroll the sample site themselves.
+  if (still) {
+    root.classList.add("ba--still");
+    chips.forEach((c) => c.classList.add("is-on"));
+    if (frame) frame.removeAttribute("tabindex");
+    return;
+  }
+
+  let ready = false;
+  const scrollFrame = (p) => {
+    if (!ready) return;
+    try {
+      const doc = frame.contentDocument;
+      const max = doc.documentElement.scrollHeight - frame.clientHeight;
+      frame.contentWindow.scrollTo(0, Math.max(0, max) * p);
+    } catch (e) { /* cross-origin or not ready: ignore */ }
+  };
 
   const set = (v) => {
     const p = clamp(v);
     root.style.setProperty("--p", p.toFixed(3));
-    if (slider) slider.value = String(Math.round(p * 100));
-    if (state) state.textContent = p < 0.12 ? "Before" : p > 0.88 ? "After" : "Fixing it";
+    if (bar) bar.style.transform = `scaleX(${p.toFixed(3)})`;
     chips.forEach((c) => c.classList.toggle("is-on", p >= parseFloat(c.dataset.at)));
+    scrollFrame(p);
   };
 
-  if (still) {
-    root.classList.add("ba--still");
-    set(1);
-  } else {
-    let ticking = false;
-    const update = () => {
-      ticking = false;
-      const r = root.getBoundingClientRect();
-      const span = r.height - window.innerHeight;
-      set(span > 0 ? -(r.top - 88) / span : 1);
-    };
-    const onScroll = () => {
-      if (!ticking) { ticking = true; requestAnimationFrame(update); }
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    update();
-  }
+  let ticking = false;
+  const update = () => {
+    ticking = false;
+    const r = root.getBoundingClientRect();
+    const span = r.height - window.innerHeight;
+    set(span > 0 ? -(r.top - 88) / span : 0);
+  };
+  const onScroll = () => {
+    if (!ticking) { ticking = true; requestAnimationFrame(update); }
+  };
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll);
 
-  if (slider) slider.addEventListener("input", () => set(Number(slider.value) / 100));
+  const onLoad = () => {
+    try { frame.contentDocument.documentElement.style.scrollBehavior = "auto"; } catch (e) { return; }
+    ready = true;
+    update();
+  };
+  if (frame) {
+    frame.addEventListener("load", onLoad);
+    if (frame.contentDocument && frame.contentDocument.readyState === "complete") onLoad();
+  }
+  update();
 }
 
 function initDots() {
   const nav = document.querySelector("[data-dots]");
   if (!nav) return;
   const items = [
-    ["story", "The difference"],
+    ["story", "A real site"],
     ["how", "How it works"],
     ["audit", "Free site check"],
     ["work", "Our work"],

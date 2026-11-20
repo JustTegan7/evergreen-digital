@@ -362,6 +362,104 @@
     </div>
 
     <!-- =====================================================================
+       Story: scroll-driven before / after, then how it works
+       js/story.js sets --p (0 to 1) from scroll position. The slider is the
+       keyboard and reduced-motion control for the same effect.
+       ===================================================================== -->
+    <section class="story" id="story" aria-label="Before and after">
+      <div class="section-wrap story__head">
+        <p class="section-label reveal">The Difference</p>
+        <h2 class="reveal">Most small business sites<br />quietly lose customers.</h2>
+        <p class="section-sub reveal">
+          Keep scrolling and watch one get fixed. Same business, same
+          services. Nothing changes except how easy it is to choose them.
+        </p>
+      </div>
+
+      <div class="ba" data-ba style="--p: 1">
+        <div class="ba__sticky">
+          <div class="ba__frame">
+            <div class="mockup-bar">
+              <div class="mockup-bar__dot mockup-bar__dot--red"></div>
+              <div class="mockup-bar__dot mockup-bar__dot--yellow"></div>
+              <div class="mockup-bar__dot mockup-bar__dot--green"></div>
+              <div class="mockup-bar__url">harborplumbing.com</div>
+            </div>
+            <div class="ba__stage">
+              <div class="ba__layer old" role="img" aria-label="An outdated website with tiny text, a visitor counter and no clear way to call">
+                <div class="old__banner">★ Welcome to Harbor Plumbing &amp; Heating ★ Est. 1998 ★</div>
+                <div class="old__nav">Home | About Us | Services | Links | Guestbook | Contact</div>
+                <div class="old__body">
+                  <div class="old__img">[ photo1.jpg ]</div>
+                  <div>
+                    <h4>Welcome to our website!!</h4>
+                    <p>We are a plumbing company and have been in business a long time. We do many things. Please call for a quote during business hours.</p>
+                    <p class="old__warn">Page last updated 2014. Best viewed in Internet Explorer.</p>
+                  </div>
+                </div>
+                <div class="old__foot">Visitors: 004521 &nbsp;|&nbsp; Under construction</div>
+              </div>
+
+              <div class="ba__layer new" role="img" aria-label="The same business with a clean modern website, a call button and reviews">
+                <div class="new__nav"><b>Harbor Plumbing</b><span>Services</span><span>Reviews</span><span>Quote</span><i>Call now</i></div>
+                <div class="new__hero">
+                  <h4>Same-day plumbing, done right the first time.</h4>
+                  <p>Licensed, insured, and upfront pricing before we start.</p>
+                  <div class="new__btns"><i>Call now</i><i class="ghost">Free quote</i></div>
+                </div>
+                <div class="new__cards"><div>Leaks &amp; repairs</div><div>Water heaters</div><div>Heating</div></div>
+                <div class="new__proof">★★★★★ 4.9 from 260 Google reviews</div>
+              </div>
+
+              <div class="ba__edge" aria-hidden="true"></div>
+
+              <ul class="ba__chips" aria-label="What changed">
+                <li class="ba__chip" data-at="0.18">⚡ Loads in under 2 seconds</li>
+                <li class="ba__chip" data-at="0.36">📱 Works on every phone</li>
+                <li class="ba__chip" data-at="0.54">📞 One tap to call</li>
+                <li class="ba__chip" data-at="0.72">⭐ Reviews front and center</li>
+                <li class="ba__chip" data-at="0.9">🔎 Easier to find on Google</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="ba__caption">
+            <span class="ba__state" aria-live="polite">After</span>
+            <label class="ba__slider-wrap">
+              <span class="sr-only">Drag to compare before and after</span>
+              <input class="ba__slider" type="range" min="0" max="100" value="100" />
+            </label>
+            <a class="ba__next" href="#how">See how we do it ↓</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="how" id="how" aria-label="How it works">
+      <div class="section-wrap">
+        <p class="section-label reveal">How It Works</p>
+        <h2 class="reveal">We build it. We run it.<br />You get back to your business.</h2>
+        <div class="how__steps">
+          <div class="how__step reveal reveal-delay-1">
+            <span class="how__num">1</span>
+            <h3>We build it</h3>
+            <p>A short call about what you do and who you want more of. We write it, design it, and launch it, usually in 2 to 3 weeks.</p>
+          </div>
+          <div class="how__step reveal reveal-delay-2">
+            <span class="how__num">2</span>
+            <h3>We run it</h3>
+            <p>Hosting, security, backups, updates, and edits are handled every month. Your team reaches out once a month to see what is new.</p>
+          </div>
+          <div class="how__step reveal reveal-delay-3">
+            <span class="how__num">3</span>
+            <h3>You grow</h3>
+            <p>Customers find you, call you, and book you. Add bookings, a store, or a card terminal when you are ready, not before.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
        Free Website Check (lead magnet)
        Widget is rendered by js/audit.js and backed by /api/audit + /api/unlock.
        Teaser (score + top issues) is free; email unlocks the full report and
@@ -665,6 +763,19 @@
           Growth $1,500, Elite $3,500). Pay your setup fee or annual prepay by
           bank transfer (ACH) and take 2% off.
         </p>
+
+        <!-- Plan builder: js/planbuilder.js renders the controls and summary -->
+        <div class="builder reveal" id="builder" aria-label="Plan builder">
+          <div class="builder__head">
+            <p class="section-label">Build your plan</p>
+            <h3>See your price before you talk to anyone.</h3>
+            <p class="builder__sub">Pick a plan, tick what you need, and watch the total update. Estimates match our standard pricing. Your agreement confirms the final numbers.</p>
+          </div>
+          <div class="builder__grid">
+            <div class="builder__controls" data-builder-controls></div>
+            <aside class="builder__summary" data-builder-summary aria-live="polite"></aside>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -1169,6 +1280,13 @@
     <!-- =====================================================================
        Footer
        ===================================================================== -->
+    <!-- Section progress dots (js/story.js) and sticky call-to-action -->
+    <nav class="dots" aria-label="Page sections" data-dots></nav>
+    <div class="sticky-cta" data-sticky-cta aria-hidden="true">
+      <span>Free 20-minute call. No pressure.</span>
+      <button class="sticky-cta__btn" data-modal-trigger aria-haspopup="dialog" tabindex="-1">Book a Call →</button>
+    </div>
+
     <footer class="footer" role="contentinfo">
       <div class="footer__brand">
         <img

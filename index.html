@@ -126,10 +126,8 @@
     <link rel="stylesheet" href="css/site.min.css" />
 
     <!-- ── Google Analytics ── -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-X0JSYKGG8L"
-    ></script>
+    <!-- Events queue in dataLayer right away. The Google script itself loads
+         after the page finishes, so it never competes with first paint. -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag() {
@@ -137,6 +135,14 @@
       }
       gtag("js", new Date());
       gtag("config", "G-X0JSYKGG8L");
+      window.addEventListener("load", function () {
+        setTimeout(function () {
+          var s = document.createElement("script");
+          s.async = true;
+          s.src = "https://www.googletagmanager.com/gtag/js?id=G-X0JSYKGG8L";
+          document.head.appendChild(s);
+        }, 1200);
+      });
     </script>
   </head>
   <body>
@@ -150,13 +156,7 @@
       aria-label="Main navigation"
     >
       <a href="/" class="nav__logo" aria-label="Evergreen Digital, Home">
-        <img
-          src="assets/brand/logo.svg"
-          alt="Evergreen Digital"
-          width="160"
-          height="36"
-          fetchpriority="high"
-        />
+        <svg xmlns="http://www.w3.org/2000/svg" width="160" height="37" role="img" aria-label="Evergreen Digital" viewBox="0 0 200 46" fill="none"><polygon points="19,1 37,25 1,25" fill="#2a7a4b" opacity="0.6"/><polygon points="19,11 38,38 0,38" fill="#2a7a4b"/><rect x="15.5" y="38" width="7" height="8" rx="1.5" fill="#1d5c37"/><text x="48" y="30" font-family="Georgia, 'Times New Roman', serif" font-size="18" font-weight="700" fill="#0e1a13" letter-spacing="-0.5">Evergreen Digital</text></svg>
       </a>
 
       <div class="nav__links">

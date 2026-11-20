@@ -162,3 +162,5 @@
 .hero .reveal-delay-4 { animation-delay: .32s; }
 @keyframes hero-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .hero .reveal, .hero .reveal-right { animation: none; } }
+.nav__logo svg { display: block; height: 36px; width: auto; }
+.nav__links a { color: #4a5c51; } .nav__links a:hover { color: var(--color-green); }

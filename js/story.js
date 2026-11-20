@@ -112,8 +112,9 @@ function initStickyCta() {
   let pastHero = false;
   let atContact = false;
   let inStory = false;
+  let overBtn = false;
   const apply = () => {
-    const show = pastHero && !atContact && !inStory;
+    const show = pastHero && !atContact && !inStory && !overBtn;
     bar.classList.toggle("is-on", show);
     bar.setAttribute("aria-hidden", String(!show));
     if (btn) btn.tabIndex = show ? 0 : -1;
@@ -121,6 +122,23 @@ function initStickyCta() {
   new IntersectionObserver(([e]) => { pastHero = !e.isIntersecting; apply(); }).observe(hero);
   if (story) new IntersectionObserver(([e]) => { inStory = e.isIntersecting; apply(); }).observe(story);
   if (contact) new IntersectionObserver(([e]) => { atContact = e.isIntersecting; apply(); }, { threshold: 0.15 }).observe(contact);
+
+  // Step aside while a plan or pricing button is near the bottom of the screen,
+  // so the bar never covers a button the visitor is about to tap.
+  const SELECTOR = ".sc-plan__cta, .pkg-card__cta, [data-builder-summary] a, [data-builder-summary] button";
+  let ticking = false;
+  const check = () => {
+    ticking = false;
+    const zone = window.innerHeight - 120;
+    const next = [...document.querySelectorAll(SELECTOR)].some((el) => {
+      const r = el.getBoundingClientRect();
+      return r.bottom > zone && r.top < window.innerHeight;
+    });
+    if (next !== overBtn) { overBtn = next; apply(); }
+  };
+  const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(check); } };
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll);
 }
 
 export function initStory() {

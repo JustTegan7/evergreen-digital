@@ -12,6 +12,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { HERO_ART, TILE_EMOJI, EXTRAS } from "./demo-art.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const an = (t) => (/^[aeiou]/i.test(t) ? "an " : "a ") + t;
@@ -71,6 +72,12 @@ function scene(icon, seed) {
 /* ── Block renderers ──────────────────────────────────────────────────────── */
 const head = (eyebrow, title, sub) => `<p class="d-eyebrow">${esc(eyebrow)}</p><h2 class="d-title">${esc(title)}</h2>${sub ? `<p class="d-sub">${esc(sub)}</p>` : ""}`;
 let tileSeed = 1;
+let curKey = "";
+function emojiTile(seed, emoji) {
+  const r = rng(seed * 61 + 5);
+  return `<div class="d-emo" style="--ang:${Math.floor(r() * 360)}deg;--x:${20 + Math.floor(r() * 60)}%;--y:${20 + Math.floor(r() * 50)}%"><span>${emoji}</span><i></i><i></i></div>`;
+}
+const initials = (n) => n.split(" ").map((w) => w[0]).join("").slice(0, 2);
 
 const BLOCKS = {
   strip: (b) => `<div class="d-strip reveal"><div class="d-wrap d-strip__in">${b.items.map(([a, c]) => `<div class="d-strip__item"><strong>${esc(a)}</strong><span>${esc(c)}</span></div>`).join("")}</div></div>`,
@@ -92,7 +99,7 @@ const BLOCKS = {
 
   tiles: (b, alt) => `<section class="d-section ${alt ? "d-section--alt" : ""}" id="${b.id}"><div class="d-wrap">
       <div class="reveal">${head(b.eyebrow, b.title, b.sub)}</div>
-      <div class="d-grid" style="grid-template-columns:repeat(auto-fit,minmax(${b.min || 210}px,1fr))">${b.tiles.map((t) => `<article class="d-tile reveal"><div class="d-tile__art">${tile(tileSeed++, t.icon || b.icon)}</div><div class="d-tile__body"><h3>${esc(t.name)}</h3><p>${esc(t.desc)}</p>${t.price ? `<div class="d-tile__foot"><span class="price">${esc(t.price)}</span><button class="d-mini" data-demo="${esc(t.demo || "On your site this adds to a cart or opens the booking flow.")}">${esc(t.btn || "Add")}</button></div>` : ""}</div></article>`).join("")}</div>
+      <div class="d-grid" style="grid-template-columns:repeat(auto-fit,minmax(${b.min || 210}px,1fr))">${b.tiles.map((t, i) => { const em = t.emoji || (TILE_EMOJI[`${curKey}.${b.id}`] || [])[i % ((TILE_EMOJI[`${curKey}.${b.id}`] || [1]).length)]; return `<article class="d-tile reveal"><div class="d-tile__art">${em ? emojiTile(tileSeed++, em) : tile(tileSeed++, t.icon || b.icon)}</div><div class="d-tile__body"><h3>${esc(t.name)}</h3><p>${esc(t.desc)}</p>${t.price ? `<div class="d-tile__foot"><span class="price">${esc(t.price)}</span><button class="d-mini" data-demo="${esc(t.demo || "On your site this adds to a cart or opens the booking flow.")}">${esc(t.btn || "Add")}</button></div>` : ""}</div></article>`; }).join("")}</div>
     </div></section>`,
 
   split: (b, alt) => `<section class="d-section ${alt ? "d-section--alt" : ""}" id="${b.id}"><div class="d-wrap d-split">
@@ -106,6 +113,26 @@ const BLOCKS = {
       <p class="d-sub" style="margin:22px 0 0;font-size:12.5px">Sample reviews for this demo. Your real Google reviews can display here automatically.</p>
     </div></section>`,
 
+  banner: (b) => `<div class="d-banner reveal"><div class="d-wrap d-banner__in"><span class="d-live"><i></i>${esc(b.label)}</span><p>${esc(b.text)}</p></div></div>`,
+
+  ticker: (b) => `<div class="d-ticker" role="presentation"><div class="d-ticker__track">${[0, 1].map((k) => b.items.map((i) => `<span${k ? ' aria-hidden="true"' : ""}>${esc(i)}</span>`).join("")).join("")}</div></div>`,
+
+  story: (b, alt) => `<section class="d-section ${alt ? "d-section--alt" : ""}" id="${b.id}"><div class="d-wrap d-story">
+      <div class="d-story__who reveal"><div class="d-avatar d-avatar--lg">${esc(b.initials)}</div><b>${esc(b.name)}</b><span>${esc(b.role)}</span></div>
+      <div class="reveal">${head(b.eyebrow, b.title, "")}<blockquote class="d-story__quote">${esc(b.quote)}</blockquote><p class="d-sign">${esc(b.name.replace(/^Pastor /, ""))}</p>
+      <ul class="d-facts">${b.facts.map((f) => `<li>${esc(f)}</li>`).join("")}</ul></div>
+    </div></section>`,
+
+  team: (b, alt) => `<section class="d-section ${alt ? "d-section--alt" : ""}"><div class="d-wrap">
+      <div class="reveal">${head(b.eyebrow, b.title, "")}</div>
+      <div class="d-grid">${b.members.map(([n, r, q], i) => `<article class="d-card d-member reveal"><div class="d-avatar" style="--rot:${i * 47}deg">${esc(initials(n))}</div><h3>${esc(n)}</h3><small>${esc(r)}</small><p>${esc(q)}</p></article>`).join("")}</div>
+    </div></section>`,
+
+  faq: (b, alt) => `<section class="d-section ${alt ? "d-section--alt" : ""}"><div class="d-wrap d-faqwrap">
+      <div class="reveal">${head(b.eyebrow, b.title, "")}</div>
+      <div class="d-faq reveal">${b.items.map(([q, a], i) => `<details${i === 0 ? " open" : ""}><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("")}</div>
+    </div></section>`,
+
   cta: (b) => `<section class="d-section" id="${b.id}"><div class="d-wrap"><div class="d-cta reveal">
       <div><h2>${esc(b.title)}</h2><p>${esc(b.sub)}</p></div>
       <form class="d-form" data-demo-form="${esc(b.done)}">${b.fields.map((f) => f.options ? `<select aria-label="${esc(f.label)}">${f.options.map((o) => `<option>${esc(o)}</option>`).join("")}</select>` : f.area ? `<textarea rows="3" placeholder="${esc(f.label)}" aria-label="${esc(f.label)}"></textarea>` : `<input type="${f.type || "text"}" placeholder="${esc(f.label)}" aria-label="${esc(f.label)}" />`).join("")}<button class="d-btn" type="submit">${esc(b.button)}</button></form>
@@ -117,8 +144,18 @@ function page(d) {
   const t = d.theme;
   const fontHead = { serif: 'Georgia, "Times New Roman", serif', sans: '"Avenir Next", "Segoe UI", system-ui, sans-serif', slab: '"Rockwell", "Roboto Slab", Georgia, serif', condensed: '"Arial Narrow", "Helvetica Neue", Arial, sans-serif' }[t.font];
   const vars = `--bg:${t.bg};--surface:${t.surface};--ink:${t.ink};--muted:${t.muted};--accent:${t.accent};--accent-ink:${t.accentInk};--line:${t.line};--font-head:${fontHead};--font-body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif${t.dark ? `;--cta-bg:${t.accent};--cta-ink:${t.accentInk};--cta-btn:${t.accentInk};--cta-btn-ink:#fff` : ""}`;
+  curKey = d.key;
+  const extras = EXTRAS[d.key] || [];
+  const woven = [];
+  const emit = (fn) => extras.filter(fn).forEach((x) => { x.__used = true; woven.push(x); });
+  d.blocks.forEach((b) => {
+    emit((x) => x.before && x.before === b.id);
+    woven.push(b);
+    emit((x) => x.after && (x.after === b.id || (x.after === "strip" && b.t === "strip")));
+  });
+  extras.filter((x) => !x.__used).forEach((x) => woven.splice(woven.length - 1, 0, x));
   let alt = false;
-  const body = d.blocks.map((b) => { const html = BLOCKS[b.t](b, alt); if (["rows", "cards", "tiles", "split", "quotes"].includes(b.t)) alt = !alt; return html; }).join("\n");
+  const body = woven.map((b) => { const html = BLOCKS[b.t](b, alt); if (["rows", "cards", "tiles", "split", "quotes", "story", "team", "faq"].includes(b.t)) alt = !alt; return html; }).join("\n");
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -135,6 +172,7 @@ function page(d) {
   <header class="d-head"><div class="d-wrap d-head__in">
     <a class="d-logo" href="#top">${ico(d.icon, 2.4)}${esc(d.name)}</a>
     <nav class="d-nav" aria-label="Main">${d.nav.map(([l, a]) => `<a href="#${a}">${esc(l)}</a>`).join("")}</nav>
+    ${["boutique", "game-store"].includes(d.key) ? '<span class="d-cart" aria-label="Cart">🛍 <b>0</b></span>' : ""}
     <button class="d-btn" data-demo="${esc(d.heroCta[1])}">${esc(d.heroCta[0])}</button>
     <button class="d-menu-btn" aria-label="Menu" aria-expanded="false">☰</button>
   </div></header>
@@ -146,7 +184,7 @@ function page(d) {
         <div class="d-hero__ctas"><button class="d-btn" data-demo="${esc(d.heroCta[1])}">${esc(d.heroCta[0])}</button><a class="d-btn d-btn--ghost" href="#${d.nav[0][1]}">${esc(d.secondary)}</a></div>
         <div class="d-badges">${d.badges.map((b) => `<span>${esc(b)}</span>`).join("")}</div>
       </div>
-      <div class="d-art reveal">${scene(d.icon, d.seed)}<div class="float float--a">${esc(d.float[0][0])}<small>${esc(d.float[0][1])}</small></div><div class="float float--b">${esc(d.float[1][0])}<small>${esc(d.float[1][1])}</small></div></div>
+      <div class="d-art reveal">${HERO_ART[d.key] || scene(d.icon, d.seed)}<div class="float float--a">${esc(d.float[0][0])}<small>${esc(d.float[0][1])}</small></div><div class="float float--b">${esc(d.float[1][0])}<small>${esc(d.float[1][1])}</small></div></div>
     </div></section>
 ${body}
   </main>

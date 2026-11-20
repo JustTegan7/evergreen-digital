@@ -12,7 +12,6 @@
  *   modal.js       → 2-step booking modal (lead form + Calendly embed)
  *   audit.js       → Free website check widget ([data-audit-widget])
  *   showcase.js    → "Choose your business" demo showcase
- *   industry.js    → Add-on recommender (self-initialising)
  *
  * Why ES modules?
  * ───────────────
@@ -33,7 +32,6 @@ import { initAuditWidgets }            from './audit.js';
 import { initShowcase }                from './showcase.js';
 import { initStory }                   from './story.js';
 import { initPlanBuilder }             from './planbuilder.js';
-import './industry.js';               // self-initialising; was never loaded before
 
 // ─── Initialise all modules ───────────────────────────────────────────────────
 // Modules execute after DOM parsing is complete (ES module default behaviour).

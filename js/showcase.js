@@ -60,7 +60,7 @@ const TIERS = {
       "Custom design, up to 10 pages",
       "Google Business Profile setup",
       "On-page SEO foundations",
-      "1 hr of edits + a monthly check-in",
+      "30 min of edits + a monthly check-in",
     ],
   },
   growth: {
@@ -72,7 +72,7 @@ const TIERS = {
     includes: [
       "Local SEO management",
       "Google Business Profile management + review requests",
-      "2 hrs of edits + monthly performance report",
+      "1 hr of edits + monthly performance report",
       "Juniper or Grove included, Helcim POS available",
     ],
   },
@@ -85,7 +85,7 @@ const TIERS = {
     includes: [
       "Email marketing (1 campaign/mo)",
       "Reputation + competitor monitoring",
-      "4 hrs of edits + monthly check-in",
+      "2 hrs of edits + monthly check-in",
       "Juniper or Grove included, Helcim POS available",
     ],
   },

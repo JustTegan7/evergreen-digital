@@ -31,6 +31,8 @@ import { initScrollReveal, initCounters } from './animations.js';
 import { initBookingModal }            from './modal.js';
 import { initAuditWidgets }            from './audit.js';
 import { initShowcase }                from './showcase.js';
+import { initStory }                   from './story.js';
+import { initPlanBuilder }             from './planbuilder.js';
 import './industry.js';               // self-initialising; was never loaded before
 
 // ─── Initialise all modules ───────────────────────────────────────────────────
@@ -42,3 +44,5 @@ initCounters();       // Animate numeric stats on first viewport entry
 initBookingModal();   // Wire up the 2-step booking modal funnel
 initAuditWidgets();   // Free website check (homepage + landing pages)
 initShowcase();       // "Choose your business" demo showcase
+initStory();         // Scroll-driven before/after, progress dots, sticky call-to-action
+initPlanBuilder();   // Interactive plan and add-on price builder

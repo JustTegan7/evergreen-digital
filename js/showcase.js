@@ -60,7 +60,7 @@ const TIERS = {
       "Custom design, up to 10 pages",
       "Google Business Profile setup",
       "On-page SEO foundations",
-      "1 hr of edits + a monthly check-in",
+      "30 min of edits + a monthly check-in",
     ],
   },
   growth: {
@@ -72,7 +72,7 @@ const TIERS = {
     includes: [
       "Local SEO management",
       "Google Business Profile management + review requests",
-      "2 hrs of edits + monthly performance report",
+      "1 hr of edits + monthly performance report",
       "Juniper or Grove included, Helcim POS available",
     ],
   },
@@ -85,7 +85,7 @@ const TIERS = {
     includes: [
       "Email marketing (1 campaign/mo)",
       "Reputation + competitor monitoring",
-      "4 hrs of edits + monthly check-in",
+      "2 hrs of edits + monthly check-in",
       "Juniper or Grove included, Helcim POS available",
     ],
   },
@@ -264,13 +264,18 @@ const EMBEDS = {
   "game-store": { url: "/demos/game-store/", host: "levelupgameexchange.com" },
 };
 
-function preview(biz, tier) {
+function preview(biz, tier, mode = "scroll") {
   const embed = EMBEDS[biz.key];
   if (embed) {
+    const src = mode === "pages" ? embed.url + "pages/" : embed.url;
     const real = biz.demoUrl
       ? `<a class="sc-demo-btn sc-demo-btn--alt" href="${esc(biz.demoUrl)}" target="_blank" rel="noopener" data-demo-link>${esc(biz.linkText || (biz.clientName ? `See a real client site: ${biz.clientName}` : "See a real site"))} ↗</a>`
       : "";
     return `
+      <div class="sc-modes" role="group" aria-label="Demo style">
+        <button type="button" class="sc-mode ${mode === "scroll" ? "is-on" : ""}" data-mode="scroll" aria-pressed="${mode === "scroll"}">One scrolling page</button>
+        <button type="button" class="sc-mode ${mode === "pages" ? "is-on" : ""}" data-mode="pages" aria-pressed="${mode === "pages"}">3 clickable pages</button>
+      </div>
       <div class="sc-preview">
         <div class="mockup-bar">
           <div class="mockup-bar__dot mockup-bar__dot--red"></div>
@@ -278,12 +283,12 @@ function preview(biz, tier) {
           <div class="mockup-bar__dot mockup-bar__dot--green"></div>
           <div class="mockup-bar__url">${esc(embed.host)}</div>
         </div>
-        <iframe class="sc-preview__frame" src="${esc(embed.url)}" title="Sample ${esc(biz.label.toLowerCase())} website" loading="lazy"
+        <iframe class="sc-preview__frame" src="${esc(src)}" title="Sample ${esc(biz.label.toLowerCase())} website" loading="lazy"
           sandbox="allow-scripts allow-same-origin allow-top-navigation-by-user-activation"></iframe>
       </div>
-      <a class="sc-demo-btn" href="${esc(embed.url)}" target="_blank" rel="noopener" data-demo-link>Open this demo full screen ↗</a>
+      <a class="sc-demo-btn" href="${esc(src)}" target="_blank" rel="noopener" data-demo-link>Open this demo full screen ↗</a>
       ${real}
-      <p class="sc-demo-note">Scroll inside the frame and click around. It is a sample, and yours would carry your name, photos, and prices.</p>`;
+      <p class="sc-demo-note">${mode === "pages" ? "Click through the three pages." : "Scroll inside the frame and click around."} It is a sample, and yours would carry your name, photos, and prices.</p>`;
   }
 
   const href = demoHref(biz, tier);
@@ -369,12 +374,12 @@ export function initShowcase() {
       ${individuals.map(chip).join("")}
     </div>`;
 
-  const state = { biz: null, tier: null };
+  const state = { biz: null, tier: null, mode: "scroll" };
 
   const render = () => {
     const biz = BUSINESSES.find((b) => b.key === state.biz);
     panel.innerHTML = `<div class="sc-panel__grid">
-        <div class="sc-panel__demo">${preview(biz, state.tier)}</div>
+        <div class="sc-panel__demo">${preview(biz, state.tier, state.mode)}</div>
         ${plan(biz, state.tier)}
       </div>`;
     panel.setAttribute("aria-labelledby", `sc-tab-${biz.key}`);
@@ -410,6 +415,14 @@ export function initShowcase() {
   });
 
   panel.addEventListener("click", (e) => {
+    const m = e.target.closest("[data-mode]");
+    if (m) {
+      state.mode = m.dataset.mode;
+      render();
+      panel.querySelector(`[data-mode="${state.mode}"]`)?.focus();
+      track("showcase_mode", { business_type: state.biz, mode: state.mode });
+      return;
+    }
     const t = e.target.closest("[data-tier]");
     if (t) {
       state.tier = t.dataset.tier;

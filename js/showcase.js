@@ -60,7 +60,7 @@ const TIERS = {
       "Custom design, up to 10 pages",
       "Google Business Profile setup",
       "On-page SEO foundations",
-      "1 hr of edits every month",
+      "1 hr of edits + a monthly check-in",
     ],
   },
   growth: {
@@ -71,7 +71,7 @@ const TIERS = {
     pages: 10,
     includes: [
       "Local SEO management",
-      "Google profile posts (2/mo) + review requests",
+      "Google Business Profile management + review requests",
       "2 hrs of edits + monthly performance report",
       "Juniper or Grove included, Helcim POS available",
     ],
@@ -85,7 +85,7 @@ const TIERS = {
     includes: [
       "Email marketing (1 campaign/mo)",
       "Reputation + competitor monitoring",
-      "4 hrs of edits + quarterly strategy call",
+      "4 hrs of edits + monthly check-in",
       "Juniper or Grove included, Helcim POS available",
     ],
   },
@@ -144,11 +144,10 @@ const BUSINESSES = [
     why: "People book a stylist with their eyes. Real photos of your work, easy booking, and fresh Google reviews are what fill the chair.",
     pages: ["Home", "Services & Prices", "Stylists", "Gallery", "Reviews", "Book"],
     addon: "Juniper booking (included with Growth) + SMS reminders to cut no-shows",
-    demoUrl: "https://www.barclaysalon.com/",
-    image: "/assets/images/before-after/barclay-live-hero.webp",
+    demoUrl: "",
+    image: "",
     tierParam: false,
-    clientName: "Barclay's Salon",
-    brand: { name: "Barclay's Salon", tagline: "Est. 1977, Everett", bg: "#2b231e", accent: "#c0714f", cta: "Book Now" },
+    brand: { name: "Fern & Fade Salon", tagline: "Cuts, color, and care in Everett", bg: "#2b231e", accent: "#c0714f", cta: "Book Now" },
   },
   {
     key: "trades",

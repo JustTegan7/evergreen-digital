@@ -158,7 +158,7 @@ const PAGES = [
       "Websites for hair salons and barbershops in Mill Creek and Snohomish County. Service menus, stylist pages, galleries, and online booking. Plans from $30/mo.",
     h1: "Websites for salons and barbershops in Mill Creek",
     intro:
-      "People choose a stylist with their eyes, then book with their thumbs. Your site has to show off real work, make prices clear, and get someone into the booking calendar in a few taps. We rebuilt Barclay's Salon around exactly that.",
+      "People choose a stylist with their eyes, then book with their thumbs. Your site has to show off real work, make prices clear, and get someone into the booking calendar in a few taps. We build salon sites around exactly that.",
     problems: [
       ["Stock photos instead of your work", "Clients want to see your cuts and color, not a model from a photo library. A real gallery and stylist pages build trust before the first appointment."],
       ["Booking is a phone call away", "If booking means calling during business hours, the 10pm browsers book somewhere else. Online booking, or a link to the tool you already use, captures them."],
@@ -173,7 +173,7 @@ const PAGES = [
       "Local SEO for Mill Creek and nearby cities",
     ],
     faqs: [
-      { q: "We already use a booking app. Can we keep it?", a: "Yes. We connect your existing booking tool so your calendar and client history stay exactly where they are. For Barclay's Salon, every Book button goes straight to the booking system they already used." },
+      { q: "We already use a booking app. Can we keep it?", a: "Yes. We connect your existing booking tool so your calendar and client history stay exactly where they are. Every Book button goes straight to the booking system you already use." },
       { q: "Can you take photos of our work?", a: "Yes. Photo and video is available as an add-on, quoted per shoot. Real photos of your space and work convert far better than stock images." },
       FAQ_PRICE,
       FAQ_LOCAL("Mill Creek"),

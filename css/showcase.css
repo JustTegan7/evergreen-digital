@@ -454,3 +454,9 @@
     animation: none;
   }
 }
+
+/* Demo style switch: one scrolling page or three clickable pages */
+.sc-modes { display: inline-flex; gap: 4px; padding: 4px; margin-bottom: var(--space-3); background: var(--color-off-white); border: 1px solid var(--color-border); border-radius: 999px; }
+.sc-mode { border: 0; background: transparent; padding: 8px 16px; border-radius: 999px; font: 700 13.5px var(--font-body); color: var(--color-muted); cursor: pointer; }
+.sc-mode.is-on { background: var(--color-green); color: #fff; }
+.sc-mode:focus-visible { outline: 2px solid var(--color-green-dark); outline-offset: 2px; }

@@ -140,7 +140,55 @@ const BLOCKS = {
 };
 
 /* ── Page shell ───────────────────────────────────────────────────────────── */
-function page(d) {
+const keyOf = (b) => b.id || b.t;
+
+/* Three-page versions: which blocks go on which page. Page 1 is the home page
+   (hero included); pages 2 and 3 get a small page header instead. */
+const PAGES = {
+  "coffee-shop": [
+    { label: "Home", keys: ["strip", "banner", "ticker", "why", "reviews"] },
+    { slug: "menu", label: "Menu", sub: "Everything made this morning. Tap a category to filter.", keys: ["menu"] },
+    { slug: "visit", label: "Visit", sub: "Our story, the people behind the counter, and how to find us.", keys: ["story", "team", "visit", "faq", "order"] },
+  ],
+  salon: [
+    { label: "Home", keys: ["strip", "banner", "ticker", "gallery", "reviews"] },
+    { slug: "services", label: "Services", sub: "Clear prices and the stylists who do the work.", keys: ["services", "stylists"] },
+    { slug: "visit", label: "Book and Visit", sub: "Our story, answers to common questions, and a booking request.", keys: ["story", "visit", "faq", "book"] },
+  ],
+  trades: [
+    { label: "Home", keys: ["strip", "banner", "ticker", "areas", "reviews"] },
+    { slug: "services", label: "Services", sub: "What we fix and how a job goes from call to cleanup.", keys: ["services", "how"] },
+    { slug: "about", label: "About and Quote", sub: "Who answers the phone, who shows up, and how to get a free quote.", keys: ["story", "team", "faq", "quote"] },
+  ],
+  "auto-detailing": [
+    { label: "Home", keys: ["strip", "banner", "ticker", "results", "reviews"] },
+    { slug: "packages", label: "Packages", sub: "Pick a detail that fits your car, and see how we work.", keys: ["packages", "process"] },
+    { slug: "book", label: "Book", sub: "Meet the detailer, get answers, and request a quote.", keys: ["story", "faq", "book"] },
+  ],
+  church: [
+    { label: "Home", keys: ["strip", "banner", "ticker", "visit"] },
+    { slug: "get-involved", label: "Get Involved", sub: "Ministries for every age and what is coming up.", keys: ["ministries", "events"] },
+    { slug: "about", label: "About and Give", sub: "A word from our pastor, our team, and ways to give.", keys: ["story", "team", "faq", "give"] },
+  ],
+  boutique: [
+    { label: "Home", keys: ["strip", "banner", "ticker", "new"] },
+    { slug: "gifts", label: "Gifts and Story", sub: "Find the right gift fast, and meet the shop behind it.", keys: ["gifts", "about", "story2"] },
+    { slug: "visit", label: "Visit", sub: "Hours, questions, and our monthly email.", keys: ["visit", "faq", "news"] },
+  ],
+  restaurant: [
+    { label: "Home", keys: ["strip", "banner", "ticker", "specials"] },
+    { slug: "menu", label: "Menu", sub: "Made from scratch. Tap a category to filter.", keys: ["menu", "catering"] },
+    { slug: "visit", label: "Story and Visit", sub: "The family behind the food, hours, and how to order.", keys: ["story", "team", "visit", "faq", "order"] },
+  ],
+  "game-store": [
+    { label: "Home", keys: ["strip", "banner", "ticker", "shop"] },
+    { slug: "trade-in", label: "Trade and Repair", sub: "Turn old games into new ones, and get things fixed.", keys: ["trade", "repairs"] },
+    { slug: "events", label: "Events and Contact", sub: "Game nights, the crew, and a trade-in quote.", keys: ["events", "story", "team", "faq", "quote"] },
+  ],
+};
+const pagePath = (d, i) => `/demos/${d.key}/pages/${i === 0 ? "" : PAGES[d.key][i].slug + "/"}`;
+
+function page(d, pi) {
   const t = d.theme;
   const fontHead = { serif: 'Georgia, "Times New Roman", serif', sans: '"Avenir Next", "Segoe UI", system-ui, sans-serif', slab: '"Rockwell", "Roboto Slab", Georgia, serif', condensed: '"Arial Narrow", "Helvetica Neue", Arial, sans-serif' }[t.font];
   const vars = `--bg:${t.bg};--surface:${t.surface};--ink:${t.ink};--muted:${t.muted};--accent:${t.accent};--accent-ink:${t.accentInk};--line:${t.line};--font-head:${fontHead};--font-body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif${t.dark ? `;--cta-bg:${t.accent};--cta-ink:${t.accentInk};--cta-btn:${t.accentInk};--cta-btn-ink:#fff` : ""}`;
@@ -154,14 +202,16 @@ function page(d) {
     emit((x) => x.after && (x.after === b.id || (x.after === "strip" && b.t === "strip")));
   });
   extras.filter((x) => !x.__used).forEach((x) => woven.splice(woven.length - 1, 0, x));
+  const multi = typeof pi === "number";
+  const list = multi ? PAGES[d.key][pi].keys.map((k) => woven.find((b) => keyOf(b) === k)).filter(Boolean) : woven;
   let alt = false;
-  const body = woven.map((b) => { const html = BLOCKS[b.t](b, alt); if (["rows", "cards", "tiles", "split", "quotes", "story", "team", "faq"].includes(b.t)) alt = !alt; return html; }).join("\n");
+  const body = list.map((b) => { const html = BLOCKS[b.t](b, alt); if (["rows", "cards", "tiles", "split", "quotes", "story", "team", "faq"].includes(b.t)) alt = !alt; return html; }).join("\n");
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>${esc(d.name)} | Demo site by Evergreen Digital</title>
+  <title>${multi && pi ? esc(PAGES[d.key][pi].label) + " | " : ""}${esc(d.name)} | Demo site by Evergreen Digital</title>
   <meta name="robots" content="noindex, nofollow" />
   <meta name="description" content="Sample website for ${esc(an(d.type))}, built by Evergreen Digital. Not a real business." />
   <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml" />
@@ -170,22 +220,22 @@ function page(d) {
 <body style="${vars}">
   <div class="d-bar">Sample site for ${esc(an(d.type))}. Not a real business.<a href="/#contact" target="_top">Get a site like this →</a></div>
   <header class="d-head"><div class="d-wrap d-head__in">
-    <a class="d-logo" href="#top">${ico(d.icon, 2.4)}${esc(d.name)}</a>
-    <nav class="d-nav" aria-label="Main">${d.nav.map(([l, a]) => `<a href="#${a}">${esc(l)}</a>`).join("")}</nav>
+    <a class="d-logo" href="${multi ? pagePath(d, 0) : "#top"}">${ico(d.icon, 2.4)}${esc(d.name)}</a>
+    <nav class="d-nav" aria-label="Main">${multi ? PAGES[d.key].map((pg, i) => `<a href="${pagePath(d, i)}"${i === pi ? ' aria-current="page"' : ""}>${esc(pg.label)}</a>`).join("") : d.nav.map(([l, a]) => `<a href="#${a}">${esc(l)}</a>`).join("")}</nav>
     ${["boutique", "game-store"].includes(d.key) ? '<span class="d-cart" aria-label="Cart">🛍 <b>0</b></span>' : ""}
     <button class="d-btn" data-demo="${esc(d.heroCta[1])}">${esc(d.heroCta[0])}</button>
     <button class="d-menu-btn" aria-label="Menu" aria-expanded="false">☰</button>
   </div></header>
   <main id="top">
-    <section class="d-hero"><div class="d-wrap d-hero__grid">
+    ${multi && pi > 0 ? `<section class="d-pagehead"><div class="d-wrap"><p class="d-crumb"><a href="${pagePath(d, 0)}">Home</a> / ${esc(PAGES[d.key][pi].label)}</p><h1>${esc(PAGES[d.key][pi].label)}</h1><p class="lead">${esc(PAGES[d.key][pi].sub)}</p></div></section>` : `<section class="d-hero"><div class="d-wrap d-hero__grid">
       <div class="reveal">
         <h1>${esc(d.headline)}</h1>
         <p class="lead">${esc(d.lead)}</p>
-        <div class="d-hero__ctas"><button class="d-btn" data-demo="${esc(d.heroCta[1])}">${esc(d.heroCta[0])}</button><a class="d-btn d-btn--ghost" href="#${d.nav[0][1]}">${esc(d.secondary)}</a></div>
+        <div class="d-hero__ctas"><button class="d-btn" data-demo="${esc(d.heroCta[1])}">${esc(d.heroCta[0])}</button><a class="d-btn d-btn--ghost" href="${multi ? pagePath(d, 1) : "#" + d.nav[0][1]}">${esc(d.secondary)}</a></div>
         <div class="d-badges">${d.badges.map((b) => `<span>${esc(b)}</span>`).join("")}</div>
       </div>
       <div class="d-art reveal">${HERO_ART[d.key] || scene(d.icon, d.seed)}<div class="float float--a">${esc(d.float[0][0])}<small>${esc(d.float[0][1])}</small></div><div class="float float--b">${esc(d.float[1][0])}<small>${esc(d.float[1][1])}</small></div></div>
-    </div></section>
+    </div></section>`}
 ${body}
   </main>
   <footer class="d-foot"><div class="d-wrap d-foot__in"><span>© ${esc(d.name)}. ${esc(d.address)}</span><span>Sample site built by <a href="/#contact" target="_top">Evergreen Digital</a></span></div></footer>
@@ -420,5 +470,10 @@ for (const d of DEMOS) {
   const dir = join(ROOT, "demos", d.key);
   mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, "index.html"), page(d));
+  PAGES[d.key].forEach((pg, i) => {
+    const pdir = join(dir, "pages", ...(i === 0 ? [] : [pg.slug]));
+    mkdirSync(pdir, { recursive: true });
+    writeFileSync(join(pdir, "index.html"), page(d, i));
+  });
 }
-console.log(`Wrote ${DEMOS.length} demo pages to /demos`);
+console.log(`Wrote ${DEMOS.length} demos (one-page and 3-page versions) to /demos`);

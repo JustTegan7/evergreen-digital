@@ -32,7 +32,7 @@ const NEARBY = "Everett, Mill Creek, Lynnwood, Bothell, Marysville, Edmonds, Sno
 
 const FAQ_PRICE = {
   q: "How much does a website cost?",
-  a: "Our plans run from $30 to $350 a month with a one-time setup fee of $500 to $2,000 depending on the plan. Hosting, security, backups, and updates are included in every plan, so there's no surprise bill later. Growth and Elite are month-to-month.",
+  a: "Our plans run from $30 to $350 a month with a one-time setup fee of $500 to $2,000 depending on the plan. Hosting, security, backups, and updates are included in every plan, so there's no surprise bill later. Growth and Elite are month-to-month, and you can split your setup fee into monthly payments with no interest.",
 };
 const FAQ_TIME = {
   q: "How long does it take?",
@@ -74,7 +74,7 @@ const PAGES = [
       "Room to grow into more pages or a print shop later",
     ],
     faqs: [
-      { q: "Is Ultra-Lite really $30 a month?", a: "Yes. Ultra-Lite is $30 a month with a one-time $500 setup and a 6-month term. That covers the build, hosting, security, backups, and support. Changes after launch are billed only when you ask for them, at $60 an hour." },
+      { q: "Is Ultra-Lite really $30 a month?", a: "Yes. Ultra-Lite is $30 a month with a one-time $500 setup and a 3, 6, or 12-month term. That covers the build, hosting, security, backups, and support. Changes after launch are billed only when you ask for them, at $60 an hour." },
       { q: "Can I sell prints or book shoots later?", a: "Yes. You can move up to a bigger plan any time, or add our eCommerce Storefront to sell prints online. Nothing has to be rebuilt." },
       { q: "Do I need to be a business?", a: "No. Ultra-Lite is built for individuals: artists, photographers, designers, students, and anyone who wants a professional home for their work or resume." },
       FAQ_TIME,
@@ -167,7 +167,7 @@ const PAGES = [
     includes: [
       "Service menu with prices",
       "Stylist pages and a photo gallery",
-      "Online booking or a link to your booking app",
+      "Online booking with Juniper (included with Growth and Elite) or a link to your booking app",
       "Review highlights from Google",
       "Gift card and specials pages",
       "Local SEO for Mill Creek and nearby cities",
@@ -206,7 +206,7 @@ const PAGES = [
       "Google Business Profile management on Growth",
     ],
     faqs: [
-      { q: "Can leads go straight to my phone?", a: "Yes. Quote requests can come to you by email and text. Our Lead CRM + Routing add-on also sends each lead to the right person and follows up automatically." },
+      { q: "Can leads go straight to my phone?", a: "Yes. Quote requests can come to you by email and text. Grove, our built-in CRM included with Growth and Elite, tracks every lead so nothing goes cold." },
       { q: "Do I need to write the content?", a: "No. We write your service and area pages after a short call about the work you do and the jobs you want more of." },
       FAQ_PRICE,
       FAQ_LOCAL("Everett"),
@@ -254,18 +254,18 @@ const PAGES = [
     plan: "Elite",
     title: "Boutique & Gift Shop Websites in Edmonds, WA | Evergreen Digital",
     description:
-      "Websites and online stores for boutiques and gift shops in Edmonds and Snohomish County. Managed storefronts at 2.5% per sale, not 5 to 8%. From $30/mo.",
+      "Websites and online stores for boutiques and gift shops in Edmonds and Snohomish County. Managed storefronts at 1% per sale, not 5 to 8%. From $30/mo.",
     h1: "Websites and online stores for Edmonds boutiques",
     intro:
       "A boutique wins on feel, not price. Your site should feel like walking into your shop, and it should keep selling after you lock the door. Most shop owners just don't have time to run an online store on top of a real one.",
     problems: [
       ["The store is open 40 hours a week", "Shoppers browse at night and on weekends. An online store lets them buy, or at least plan a visit, when you're closed."],
-      ["Platform fees eat the margin", "Many agencies and platforms take 5 to 8% of every sale. Our managed storefront takes 2.5%, and we run it for you."],
+      ["Platform fees eat the margin", "Many agencies and platforms take 5 to 8% of every sale. Our managed storefront takes 1%, and we run it for you."],
       ["Nobody knows what's new", "New arrivals are why regulars come back. A New Arrivals page and a monthly email bring them in the door."],
     ],
     includes: [
       "A site designed to match the feel of your shop",
-      "Managed online store (add-on, $79/mo + 2.5%)",
+      "Managed online store (add-on, $149/mo + 1%)",
       "New arrivals and gift guide pages",
       "Visit us page with hours, parking, and directions",
       "Email marketing on Elite (1 campaign/mo)",

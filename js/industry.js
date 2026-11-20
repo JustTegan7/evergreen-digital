@@ -11,12 +11,13 @@
    change a plan or add-on price, update the matching total below and re-check
    the arithmetic in the comment beside it.
 
-   Reference prices (Oct 11, 2026):
+   Reference prices (Nov 20, 2026, matches contract v4 Schedule A):
      Ultra-Lite $30 · Basic $50 · Growth $150 · Elite $350
-     Setup: $500 · $1,000 · $1,500 · $2,000 (Ultra-Lite/Basic on 6-month term)
-     SMS + Email $79 · Reputation $49 (incl. Elite) · Social $199
-     Ads $249 · Lead CRM $149 · AI Receptionist from $149
-     eCommerce $79 + 2.5% · Business Portal from $149 · Extra edits $60/hr
+     Setup: $500 · $1,000 · $1,500 · $2,000
+     SMS + Email $149 (email incl. Elite) · Reputation $99 (incl. Growth + Elite)
+     Social $399 · Google Ads $350 (+ ad spend) · eCommerce $149 + 1%
+     Business Portal from $199 · Juniper $69 / Grove $39 (incl. Growth + Elite)
+     POS $20 reader / $30 terminal (Growth + Elite) · Extra edits $60/hr
      Photo + Video quoted per shoot. No Elite add-on discount.
    ============================================================================= */
 
@@ -26,19 +27,19 @@ const INDUSTRY_PACKAGES = {
   "home-services": {
     label: "Home Services",
     plan: "Growth",
-    addons: ["SMS + Email Marketing", "Lead CRM + Routing"],
-    total: "$378", // 150 + 79 + 149
+    addons: ["SMS + Email Marketing", "Grove CRM (included)"],
+    total: "$299", // 150 + 149 (Grove included with Growth)
     suffix: "/mo",
     reason:
       "Trades live and die by the schedule. Automated reminders cut no-shows " +
-      "by 25 to 30%, and routed leads mean the 7am call never sits unanswered " +
-      "while you\u2019re under a sink.",
+      "by 25 to 30%, and Grove tracks every lead so the 7am call never sits " +
+      "unanswered while you\u2019re under a sink.",
   },
   salons: {
     label: "Salons & Spas",
     plan: "Growth",
-    addons: ["SMS + Email Marketing", "Photo + Video"],
-    total: "$229", // 150 + 79  (+ video quoted per shoot)
+    addons: ["SMS + Email Marketing", "Juniper booking (included)", "Photo + Video"],
+    total: "$299", // 150 + 149  (Juniper included; video quoted per shoot)
     suffix: "/mo + shoots",
     reason:
       "People book a salon with their eyes. Real photography and video of " +
@@ -48,20 +49,20 @@ const INDUSTRY_PACKAGES = {
   retail: {
     label: "Retail & eCommerce",
     plan: "Elite",
-    addons: ["eCommerce Storefront"],
-    total: "$429", // 350 + 79  (+ 2.5% of transactions)
-    suffix: "/mo + 2.5%",
+    addons: ["eCommerce Storefront", "Helcim POS for the counter (optional)"],
+    total: "$499", // 350 + 149  (+ 1% of transactions; POS billed per terminal)
+    suffix: "/mo + 1%",
     reason:
-      "Most agencies take 5 to 8% of every sale. We take 2.5%. On $50k a month " +
-      "in sales that difference is roughly $15,000 a year, which usually " +
-      "pays for the entire plan several times over.",
+      "Most agencies take 5 to 8% of every sale. We take 1%. On $50k a month " +
+      "in sales that is $500 instead of $2,500 or more, a difference that " +
+      "covers the storefront fee several times over.",
   },
   professional: {
     label: "Professional Services",
     plan: "Growth",
-    addons: ["Google or Meta Ads Management", "SMS + Email Marketing"],
-    total: "$478", // 150 + 249 + 79
-    suffix: "/mo",
+    addons: ["Google Ads Management", "Grove CRM (included)"],
+    total: "$500", // 150 + 350 (Grove included; ad spend billed by Google)
+    suffix: "/mo + ad spend",
     reason:
       "When someone searches for a lawyer or an accountant, they are ready " +
       "to hire today. Paid search puts you in front of that moment, and SEO " +
@@ -71,8 +72,8 @@ const INDUSTRY_PACKAGES = {
     label: "Gyms & Fitness",
     plan: "Growth",
     addons: ["SMS + Email Marketing", "Custom Business Portal"],
-    total: "$378", // 150 + 79 + 149 (portal from $149)
-    suffix: "/mo",
+    total: "$498", // 150 + 149 + 199 (portal from $199)
+    suffix: "/mo and up",
     reason:
       "Signing members is the easy part, keeping them is the business. A " +
       "member portal plus consistent check-ins is what turns a January " +
@@ -81,8 +82,8 @@ const INDUSTRY_PACKAGES = {
   nonprofits: {
     label: "Churches & Nonprofits",
     plan: "Growth",
-    addons: ["SMS + Email Marketing", "Reputation Monitoring"],
-    total: "$278", // 150 + 79 + 49
+    addons: ["SMS + Email Marketing", "Reputation Monitoring (included)"],
+    total: "$299", // 150 + 149 (Reputation included with Growth)
     suffix: "/mo",
     reason:
       "Giving follows trust. Being easy to find, easy to contact, and " +

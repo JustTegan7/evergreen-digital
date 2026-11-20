@@ -31,7 +31,7 @@
    showcase_select, showcase_tier, showcase_demo_click.
 
    PRICES: keep TIERS in sync with the Packages section and the pricing
-   master sheet (Oct 2026: Ultra-Lite $30 / Basic $50 / Growth $150 / Elite $350, setup $500/$1,000/$1,500/$2,000).
+   master sheet (Nov 2026, contract v4 Schedule A: Ultra-Lite $30 / Basic $50 / Growth $150 / Elite $350, setup $500/$1,000/$1,500/$2,000).
    ============================================================================= */
 
 "use strict";
@@ -41,10 +41,10 @@ const TIERS = {
     name: "Ultra-Lite",
     price: "$30",
     setup: "$500 setup",
-    term: "6-month term",
+    term: "3, 6, or 12-month term",
     pages: 3,
     includes: [
-      "1 to 3 pages, built from our proven layouts",
+      "Up to 3 pages, built from our proven layouts",
       "Mobile-friendly design + contact form",
       "Hosting, SSL, daily backups, uptime monitoring",
       "Changes billed per request ($60/hr)",
@@ -54,13 +54,13 @@ const TIERS = {
     name: "Basic",
     price: "$50",
     setup: "$1,000 setup",
-    term: "6-month term",
-    pages: 5,
+    term: "3, 6, or 12-month term",
+    pages: 10,
     includes: [
-      "Custom design, up to 5 pages",
+      "Custom design, up to 10 pages",
       "Google Business Profile setup",
       "On-page SEO foundations",
-      "30 min of edits every month",
+      "1 hr of edits every month",
     ],
   },
   growth: {
@@ -70,10 +70,10 @@ const TIERS = {
     term: "Month-to-month",
     pages: 10,
     includes: [
-      "Up to 10 pages",
       "Local SEO management",
       "Google profile posts (2/mo) + review requests",
-      "1 hr of edits + monthly performance report",
+      "2 hrs of edits + monthly performance report",
+      "Juniper or Grove included, Helcim POS available",
     ],
   },
   elite: {
@@ -83,10 +83,10 @@ const TIERS = {
     term: "Month-to-month",
     pages: 20,
     includes: [
-      "Up to 20 pages",
       "Email marketing (1 campaign/mo)",
       "Reputation + competitor monitoring",
-      "2 hrs of edits + quarterly strategy call",
+      "4 hrs of edits + quarterly strategy call",
+      "Juniper or Grove included, Helcim POS available",
     ],
   },
 };
@@ -143,7 +143,7 @@ const BUSINESSES = [
     recommended: "growth",
     why: "People book a stylist with their eyes. Real photos of your work, easy booking, and fresh Google reviews are what fill the chair.",
     pages: ["Home", "Services & Prices", "Stylists", "Gallery", "Reviews", "Book"],
-    addon: "SMS reminders to cut no-shows",
+    addon: "Juniper booking (included with Growth) + SMS reminders to cut no-shows",
     demoUrl: "https://www.barclaysalon.com/",
     image: "/assets/images/before-after/barclay-live-hero.webp",
     tierParam: false,
@@ -157,7 +157,7 @@ const BUSINESSES = [
     recommended: "growth",
     why: "When a pipe bursts, people call the first business that looks trustworthy on their phone. Tap-to-call, service areas, and reviews win that call.",
     pages: ["Home", "Services", "Service Areas", "Reviews", "Financing", "Get a Quote"],
-    addon: "Lead CRM + Routing so no call goes cold",
+    addon: "Grove CRM (included with Growth) so no call goes cold",
     demoUrl: "",
     image: "",
     tierParam: false,
@@ -194,9 +194,9 @@ const BUSINESSES = [
     label: "Boutique & Gift Shop",
     emoji: "🛍️",
     recommended: "elite",
-    why: "A boutique competes with Amazon on feel, not price. A site that looks like your shop, and an online store we manage for 2.5%, keeps sales coming when the doors are closed.",
+    why: "A boutique competes with Amazon on feel, not price. A site that looks like your shop, and an online store we manage for 1%, keeps sales coming when the doors are closed.",
     pages: ["Home", "Shop", "New Arrivals", "About", "Visit Us", "Gift Cards"],
-    addon: "eCommerce Storefront ($79/mo + 2.5%)",
+    addon: "eCommerce Storefront ($149/mo + 1%)",
     demoUrl: "",
     image: "",
     tierParam: false,

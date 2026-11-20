@@ -127,6 +127,18 @@
   background: var(--color-white);
 }
 
+/* In-site demo frame */
+.sc-preview__frame {
+  display: block;
+  width: 100%;
+  height: 560px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--color-white);
+}
+.sc-demo-btn--alt { margin-top: var(--space-2); opacity: 0.85; }
+@media (max-width: 700px) { .sc-preview__frame { height: 480px; } }
+
 /* Styled stand-in until a demo screenshot exists */
 .sc-mock {
   --mock-bg: #1a2e20;

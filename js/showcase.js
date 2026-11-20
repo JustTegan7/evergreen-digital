@@ -211,7 +211,7 @@ const BUSINESSES = [
     addon: "SMS + Email Marketing for specials",
     demoUrl: "https://tatas-mexican-restaurant.vercel.app/",
     image: "/assets/images/work/tatas.webp",
-    linkText: "Open our demo for Tata's Mexican Restaurant",
+    linkText: "See our prospect demo for Tata's Mexican Restaurant",
     tierParam: false,
     brand: { name: "Casa Verde Cantina", tagline: "Family recipes since 1998", bg: "#2d3b1f", accent: "#e8b04a", cta: "View the Menu" },
   },
@@ -251,27 +251,46 @@ function demoHref(biz, tier) {
   return u.href;
 }
 
+/* In-site demo pages (built by scripts/build-demos.mjs). They show inside the
+   browser frame so visitors can scroll and click around without leaving. */
+const EMBEDS = {
+  "coffee-shop": { url: "/demos/coffee-shop/", host: "cedarandsteamcoffee.com" },
+  salon: { url: "/demos/salon/", host: "fernandfadesalon.com" },
+  trades: { url: "/demos/trades/", host: "summitplumbingheating.com" },
+  "auto-detailing": { url: "/demos/auto-detailing/", host: "glossmobiledetailing.com" },
+  church: { url: "/demos/church/", host: "riversidecommunitychurch.org" },
+  boutique: { url: "/demos/boutique/", host: "willowandwren.com" },
+  restaurant: { url: "/demos/restaurant/", host: "casaverdecantina.com" },
+  "game-store": { url: "/demos/game-store/", host: "levelupgameexchange.com" },
+};
+
 function preview(biz, tier) {
+  const embed = EMBEDS[biz.key];
+  if (embed) {
+    const real = biz.demoUrl
+      ? `<a class="sc-demo-btn sc-demo-btn--alt" href="${esc(biz.demoUrl)}" target="_blank" rel="noopener" data-demo-link>${esc(biz.linkText || (biz.clientName ? `See a real client site: ${biz.clientName}` : "See a real site"))} ↗</a>`
+      : "";
+    return `
+      <div class="sc-preview">
+        <div class="mockup-bar">
+          <div class="mockup-bar__dot mockup-bar__dot--red"></div>
+          <div class="mockup-bar__dot mockup-bar__dot--yellow"></div>
+          <div class="mockup-bar__dot mockup-bar__dot--green"></div>
+          <div class="mockup-bar__url">${esc(embed.host)}</div>
+        </div>
+        <iframe class="sc-preview__frame" src="${esc(embed.url)}" title="Sample ${esc(biz.label.toLowerCase())} website" loading="lazy"
+          sandbox="allow-scripts allow-same-origin allow-top-navigation-by-user-activation"></iframe>
+      </div>
+      <a class="sc-demo-btn" href="${esc(embed.url)}" target="_blank" rel="noopener" data-demo-link>Open this demo full screen ↗</a>
+      ${real}
+      <p class="sc-demo-note">Scroll inside the frame and click around. It is a sample, and yours would carry your name, photos, and prices.</p>`;
+  }
+
   const href = demoHref(biz, tier);
   const host = biz.demoUrl ? new URL(biz.demoUrl).host : `${biz.key}.demo.evergreendigitalco.com`;
-  const b = biz.brand;
-  const pagesShown = biz.pages.slice(0, Math.min(biz.pages.length, TIERS[tier].pages));
-
   const body = biz.image
-    ? `<img class="sc-preview__img" src="${esc(biz.image)}" alt="${esc(biz.clientName || biz.linkText || b.name)} website preview" loading="lazy" />`
-    : `<div class="sc-mock ${b.light ? "sc-mock--light" : ""}" style="--mock-bg:${b.bg};--mock-accent:${b.accent}">
-         <div class="sc-mock__nav">
-           <span class="sc-mock__logo">${esc(b.name)}</span>
-           <span class="sc-mock__links">${pagesShown.slice(1, 4).map((p) => `<span>${esc(p)}</span>`).join("")}</span>
-         </div>
-         <div class="sc-mock__hero">
-           <span class="sc-mock__tag">${esc(b.tagline)}</span>
-           <span class="sc-mock__headline">${esc(b.name)}</span>
-           <span class="sc-mock__cta">${esc(b.cta)}</span>
-         </div>
-         <div class="sc-mock__cards"><span></span><span></span><span></span></div>
-       </div>`;
-
+    ? `<img class="sc-preview__img" src="${esc(biz.image)}" alt="${esc(biz.clientName || biz.linkText || biz.brand.name)} website preview" loading="lazy" />`
+    : `<div class="sc-mock" style="--mock-bg:${biz.brand.bg};--mock-accent:${biz.brand.accent}"><div class="sc-mock__hero"><span class="sc-mock__headline">${esc(biz.brand.name)}</span></div></div>`;
   return `
     <div class="sc-preview">
       <div class="mockup-bar">
@@ -284,9 +303,7 @@ function preview(biz, tier) {
     </div>
     ${
       href
-        ? `<a class="sc-demo-btn" href="${esc(href)}" target="_blank" rel="noopener" data-demo-link>
-             ${esc(biz.linkText || (biz.clientName ? `View ${biz.clientName}, a real client site` : "Open the live demo"))} ↗
-           </a>`
+        ? `<a class="sc-demo-btn" href="${esc(href)}" target="_blank" rel="noopener" data-demo-link>${esc(biz.linkText || (biz.clientName ? `View ${biz.clientName}, a real client site` : "Open the live demo"))} ↗</a>`
         : `<p class="sc-demo-note">Demo site in progress. Want a walkthrough of what yours could look like? <button type="button" class="sc-inline-link" data-modal-trigger aria-haspopup="dialog">Book a free call</button>.</p>`
     }`;
 }
